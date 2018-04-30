@@ -1,6 +1,9 @@
 devtools::use_data_raw()
 devtools::use_package("mice")
+<<<<<<< HEAD
 devtools::use_package("mvtnorm")
+=======
+>>>>>>> 9c2a3444ff3ae2f5e0a70f129fa3a0b0fd9565a5
 devtools::use_package("magrittr")
 devtools::use_vignette("misaem")
 

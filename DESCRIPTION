@@ -10,7 +10,10 @@ Encoding: UTF-8
 URL: https://github.com/wjiang94/misaem.git
 Imports: mice,
     magrittr,
+<<<<<<< HEAD
     mvtnorm
+=======
+>>>>>>> 9c2a3444ff3ae2f5e0a70f129fa3a0b0fd9565a5
 Suggests: knitr,
     rmarkdown
 LazyData: true
