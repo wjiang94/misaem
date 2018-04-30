@@ -22,8 +22,6 @@ likelihood_saem(beta, mu, Sigma, Y, X.obs, rindic, whichcolXmissing, mc.size)
 \item{whichcolXmissing}{The column index in covariate containing at least one missing observation.}
 
 \item{mc.size}{Monte Carlo sampling size.}
-
-\item{pos_var}{Index of selected covariates.}
 }
 \value{
 Observed log-likelihood.

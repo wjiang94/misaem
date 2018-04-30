@@ -6,10 +6,10 @@
 #' @param Sigma Estimated parameter \eqn{\Sigma}.
 #' @param Y Response vector \eqn{N \times 1}{N * 1}
 #' @param X.obs Design matrix with missingness \eqn{N \times p}{N * p}
-#' @param pos_var Index of selected covariates.
 #' @param rindic Missing pattern of X.obs. If a component in X.obs is missing, the corresponding position in rindic is 1; else 0.
 #' @param whichcolXmissing The column index in covariate containing at least one missing observation.
 #' @param mc.size Monte Carlo sampling size.
+#' @import mvtnorm stats MASS
 #' @return Observed log-likelihood.
 #' @export
 

@@ -10,6 +10,7 @@
 #' @param rindic Missing pattern of X.obs. If a component in X.obs is missing, the corresponding position in rindic is 1; else 0.
 #' @param whichcolXmissing The column index in covariate containing at least one missing observation.
 #' @param mc.size Monte Carlo sampling size.
+#' @import stats
 #' @return Variance of estimated \eqn{\beta}.
 #' @export
 

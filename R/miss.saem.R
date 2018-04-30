@@ -22,8 +22,7 @@
 #' \item{ll}{Observed log-likelihood.}
 #' \item{var_obs}{Estimated variance for estimated parameters.}
 #' \item{std_obs}{Estimated standard error for estimated parameters.}
-#' @import magrittr mvtnorm
-#' @importFrom stats glm
+#' @import mvtnorm stats
 #' @examples
 #' # Generate dataset
 #' N <- 1000  # number of subjects
@@ -40,7 +39,8 @@
 #' beta.star <- c(0.5, -0.3, 1, 0, -0.6) # coefficients
 #' beta0.star <- -0.2  # intercept
 #' beta.true = c(beta0.star,beta.star)
-#' X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star) + matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+#' X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)
+#'              + matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
 #' p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
 #' y <- as.numeric(runif(N)<p1)
 #'
