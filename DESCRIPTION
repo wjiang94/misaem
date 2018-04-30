@@ -1,0 +1,18 @@
+Package: misaem
+Title: SAEM for logistic regression with missing data
+Version: 0.0.0.9000
+Date: 2018-04-30
+Authors@R: person("Wei", "Jiang", email = "wei.jiang@polytechnique.edu", role = c("aut", "cre"))
+Description: A R package to perform logistic regression with missing data, using algorithm Stochastic approximated EM.
+Depends: R (>= 3.4.1)
+License: GPL
+Encoding: UTF-8
+URL: https://github.com/wjiang94/misaem.git
+Imports: mice,
+    magrittr,
+    mvtnorm
+Suggests: knitr,
+    rmarkdown
+LazyData: true
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1
