@@ -1,0 +1,10 @@
+---
+title: "SAEM for logistic regression with missing data"
+author: "Wei Jiang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SAEM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
