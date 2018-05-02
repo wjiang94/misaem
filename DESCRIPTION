@@ -13,7 +13,6 @@ Imports: mice,
     mvtnorm,
     stats,
     MASS,
-    mvtnorm
 Suggests: knitr,
     rmarkdown
 LazyData: true
