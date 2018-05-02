@@ -12,11 +12,7 @@ Imports: mice,
     magrittr,
     mvtnorm,
     stats,
-<<<<<<< HEAD
     MASS
-=======
-    MASS,
->>>>>>> 2cb72d30763047b0ace1db02668980e2ac8ae7b6
 Suggests: knitr,
     rmarkdown
 LazyData: true
