@@ -1,5 +1,5 @@
 ---
-title: "SAEM for logistic regression with missing data"
+title: "Stochastic Approximation EM for Logistic Regression with Missing Values"
 author: "Wei Jiang"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
