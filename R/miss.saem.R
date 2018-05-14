@@ -56,8 +56,18 @@
 #' @export
 
 miss.saem <- function(X.obs,y,pos_var=1:ncol(X.obs),maxruns=500,tol_em=1e-7,nmcmc=2,tau=1,k1=50,print_iter=TRUE, var_cal=FALSE, ll_obs_cal=FALSE) {
-  #delete rows completely missing
+
+  #judge
+  if (class(X.obs) == "data.frame") {
+    X.obs <- as.matrix(X.obs)
+  }
+  if (sum(sapply(X.obs, is.numeric)) < ncol(X.obs)) {
+    stop("Error: the variables should be numeric.")
+  }
+
   p=ncol(X.obs)#x1,x2
+
+  #delete rows completely missing
   if(any(apply(is.na(X.obs),1,sum)==p)){
     i_allNA=which(apply(is.na(X.obs),1,sum)==p)
     X.obs = X.obs[-i_allNA,]

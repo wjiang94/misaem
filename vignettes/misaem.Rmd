@@ -8,3 +8,103 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+## Introduction of misaem
+
+misaem is a method to apply statistical inference for logistic regression model with missing data. This method is based on likelihood, including 
+1. A stochastic approximation version of EM algorithm based on Metropolis-Hasting sampling, to estimate the parameters of logistic regression.
+2. Estimation of parameters' variance based one Louis formula
+3. Model selection procedure based on AIC or BIC 
+
+```{r}
+library(misaem)
+```
+
+
+## Logistic regression model and missing data
+
+Let $(\by,\bx)$ be the observed data with $\by=(y_i , 1\leq i \leq n)$  a $n$-vector of binary responses coded with $\{0, 1\}$ and $\bx= (x_{ij}, 1\leq i \leq n, 1 \leq j \leq p)$ a  $n\times p$ matrix of covariates  where $x_{ij}$ takes its values in $\mathbb{R}$. 
+
+The logistic regression model for binary classification can be specified as 
+\begin{equation} \label{regmodel}
+\prob{y_i=1|\bx_i;\bbeta}= 
+\frac{\exp(\beta_0 + \sum_{j=1}^p \beta_j x_{ij})}
+{ 1+\exp(\beta_0 + \sum_{j=1}^p \beta_j x_{ij}) }, 
+\quad i=1,\cdots,n. 
+\end{equation}
+where $x_{i1},\ldots, x_{ip}$ are the covariates for individual $i$ and $\beta_0,\beta_1,\ldots,\beta_p$ are real parameters.
+
+Our main objective is to estimate the vector of parameters $\bbeta=(\beta_j,0\leq j \leq p)$ 
+ in the framework of missing values in the design matrix, i.e. in matrix $\bx$. We adopt a probabilistic framework by assuming that 
+ $\bx_i = (x_{i1},\ldots, x_{ip})$ is normally distributed:
+\begin{equation*}
+\bx_i \iid \mathcal{N}_p(\mu,\Sigma), \quad i=1,\cdots,n. 
+\end{equation*}
+
+Let $\theta=(\mu, \Sigma, \bbeta)$ be the set of parameters of the model. Then, the log-likelihood for the complete data can be written as
+\begin{equation*}
+\begin{split}
+\llike(\theta;\bx,\by) & =\sum_{i=1}^n \llike(\theta;\bx_i,y_i) \\
+&=\sum_{i=1}^n \Big( \log  (\dens(y_i|\bx_i;\bbeta))+\log (\dens(\bx_i;\mu,\Sigma)) \Big).
+\end{split}
+\end{equation*}
+
+Missing values are  distributed in the design matrix and not in the response. 
+For each individual $i$, we note $\xiobs$ the elements of $\bx_{i}$ that are observed and $\ximis$ the elements that are missing. We also decompose the matrix of covariates  as $\bx = (\xobs,\xmis)$ but keeping in mind that the missing elements may differ from one individual to another.
+
+## Simulation study
+
+We first generated a design matrix $\bx$ of size $N=1000$ times $p=5$ by drawing each observation from a multivariate normal distribution $\mathcal{N}(\mu, \Sigma)$. Then, we generate the response according to the logistic regression model \eqref{regmodel}.
+
+We consider as the true values for the parameters
+\begin{equation*}
+\begin{split}
+\bbeta &= (-0.2, 0.5, -0.3, 1, 0, -0.6),\\
+\mu &= (1,2,3,4,5),\\
+\Sigma &= \text{diag}(\sigma)C \text{diag}(\sigma),
+\end{split}
+\end{equation*} 
+where the $\sigma$ is the vector of standard deviations 
+$$\sigma=(1,2,3,4,5)$$  
+and  $C$ the correlation matrix 
+$$C = \begin{bmatrix}
+1  & 0.8 & 0 & 0 &   0\\
+0.8 & 1 & 0 & 0  &  0\\
+0  & 0 & 1 & 0.3 &   0.6\\
+0 & 0 & 0.3 & 1 &  0.7\\
+0 & 0 & 0.6 & 0.7 &  1\\
+\end{bmatrix}.$$ 
+
+Then we randomly introduced 10\% of missing values in the covariates according to the MCAR mechanism.
+
+```{r}
+# Generate dataset
+N <- 1000  # number of subjects
+p <- 5     # number of explanatory variables
+mu.star <- 1:p  #rep(0,p)  # mean of the explanatory variables
+sd <- 1:p # rep(1,p) # standard deviations
+C <- matrix(c(   # correlation matrix
+1,   0.8, 0,   0,   0,
+0.8, 1,   0,   0,   0,
+0,   0,   1,   0.3, 0.6,
+0,   0,   0.3, 1,   0.7,
+0,   0,   0.6, 0.7, 1), nrow=p)
+Sigma.star <- diag(sd)%*%C%*%diag(sd) # variance-covariance matrix of the explanatory variables
+beta.star <- c(0.5, -0.3, 1, 0, -0.6) # coefficients
+beta0.star <- -0.2  # intercept
+beta.true = c(beta0.star,beta.star)
+X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)
+             + matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
+y <- as.numeric(runif(N)<p1)
+
+# Generate missingness
+p.miss <- 0.10
+patterns <- runif(N*p)<p.miss #missing completely at random
+X.obs <- X.complete
+X.obs[patterns] <- NA
+# SAEM
+list.saem = miss.saem(X.obs,y)
+print(list.saem$beta)
+```
+
+
