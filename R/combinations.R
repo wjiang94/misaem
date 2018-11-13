@@ -9,7 +9,7 @@
 
 combinations = function(p){
   comb = NULL
-  if (p<15) {
+  if (p<20) {
     for( i in 1:p) comb = rbind(cbind(1,comb),cbind(0,comb))
     return(comb)
   }
