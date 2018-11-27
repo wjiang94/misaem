@@ -15,3 +15,6 @@ A matrix containing all the possible missing patterns. Each row indicates a patt
 \description{
 Given all the possible patterns of missingness.
 }
+\examples{
+comb = combinations(5)
+}

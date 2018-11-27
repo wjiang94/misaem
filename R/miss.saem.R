@@ -1,14 +1,15 @@
 #' miss.saem
 #'
-#' Main function: using algorithm SAEM to fit the logistic regression model with missing data
+#' This function uses algorithm SAEM to fit the logistic regression model with missing data.
 #' @param X.obs Design matrix with missingness \eqn{N \times p}{N * p}
 #' @param y Response vector \eqn{N \times 1}{N * 1}
-#' @param pos_var Index of selected covariates. The default is pos_var = 1:p.
+#' @param pos_var Index of selected covariates. The default is pos_var = 1:ncol(X.obs).
 #' @param maxruns Maximum number of iterations. The default is maxruns = 500.
 #' @param tol_em The tolerance to stop SAEM. The default is tol_em = 1e-7.
 #' @param nmcmc The MCMC length. The default is nmcmc = 2.
 #' @param tau Rate \eqn{\tau}{\tau} in the step size \eqn{(k-k_{1})^{-\tau}}{(k-k1)^(-\tau)}. The default is tau = 1.
 #' @param k1 Number of first iterations \eqn{k_{1}}{k1} in the step size \eqn{(k-k_{1})^{-\tau}}{(k-k1)^(-\tau)}. The default is k1=50.
+#' @param seed An integer as a seed set for the radom generator. The default value is 200.
 #' @param print_iter If TRUE, miss.saem will print the estimated parameters in each iteration of SAEM.
 #' @param var_cal If TRUE, miss.saem will calculate the variance of estimated parameters.
 #' @param ll_obs_cal If TRUE, miss.saem will calculate the observed log-likelihood.
@@ -25,7 +26,7 @@
 #' @import mvtnorm stats
 #' @examples
 #' # Generate dataset
-#' N <- 1000  # number of subjects
+#' N <- 500  # number of subjects
 #' p <- 5     # number of explanatory variables
 #' mu.star <- 1:p  #rep(0,p)  # mean of the explanatory variables
 #' sd <- 1:p # rep(1,p) # standard deviations
@@ -35,12 +36,12 @@
 #' 0,   0,   1,   0.3, 0.6,
 #' 0,   0,   0.3, 1,   0.7,
 #' 0,   0,   0.6, 0.7, 1), nrow=p)
-#' Sigma.star <- diag(sd)%*%C%*%diag(sd) # variance-covariance matrix of the explanatory variables
-#' beta.star <- c(0.5, -0.3, 1, 0, -0.6) # coefficients
-#' beta0.star <- -0.2  # intercept
+#' Sigma.star <- diag(sd)%*%C%*%diag(sd) # covariance
+#' beta.star <- c(1, -1, 1, 0, -1) # coefficients
+#' beta0.star <- -0  # intercept
 #' beta.true = c(beta0.star,beta.star)
-#' X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)
-#'              + matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+#' X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)+
+#'               matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
 #' p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
 #' y <- as.numeric(runif(N)<p1)
 #'
@@ -55,7 +56,8 @@
 #' print(list.saem$beta)
 #' @export
 
-miss.saem <- function(X.obs,y,pos_var=1:ncol(X.obs),maxruns=500,tol_em=1e-7,nmcmc=2,tau=1,k1=50,print_iter=TRUE, var_cal=FALSE, ll_obs_cal=FALSE) {
+miss.saem <- function(X.obs,y,pos_var=1:ncol(X.obs),maxruns=500,tol_em=1e-7,nmcmc=2,tau=1,k1=50, seed=200, print_iter=TRUE, var_cal=FALSE, ll_obs_cal=FALSE) {
+  set.seed(seed)
 
   #judge
   if (class(X.obs) == "data.frame") {
@@ -64,8 +66,19 @@ miss.saem <- function(X.obs,y,pos_var=1:ncol(X.obs),maxruns=500,tol_em=1e-7,nmcm
   if (sum(sapply(X.obs, is.numeric)) < ncol(X.obs)) {
     stop("Error: the variables should be numeric.")
   }
+  if (sum(y==1) +  sum(y==0) < nrow(X.obs)) {
+    stop("Error: y must be coded by 0 or 1, and there is no missing data in y.")
+  }
 
-  p=ncol(X.obs)#x1,x2
+  if (sum(pos_var %in% 1:ncol(X.obs)) < length(pos_var))  {
+    stop("Error: index of selected variables must be in the range of covariates.")
+  }
+
+  if (length(unique(pos_var)) != length(pos_var)){
+    stop("Error: index of selected variables must not be repeated.")
+  }
+
+  p=ncol(X.obs)
 
   #delete rows completely missing
   if(any(apply(is.na(X.obs),1,sum)==p)){
@@ -151,8 +164,7 @@ miss.saem <- function(X.obs,y,pos_var=1:ncol(X.obs),maxruns=500,tol_em=1e-7,nmcm
       }
       beta_new= rep(0,p+1)
       beta_new[c(1,pos_var+1)]= glm(y~ X.sim[,pos_var],family=binomial(link='logit'))$coef
-      # data.sim <- data.frame(y=y,X.sim)
-      # model.sim <- glm(y ~.,family=binomial(link='logit'),data=data.sim)
+
       beta <- (1-gamma)*beta + gamma*beta_new
       cstop = sum((beta-beta.old)^2)
 
@@ -167,13 +179,13 @@ miss.saem <- function(X.obs,y,pos_var=1:ncol(X.obs),maxruns=500,tol_em=1e-7,nmcm
         seqbeta_avg[,k]= 1/k*rowSums(seqbeta[,1:k])
       }
 
-      if(print_iter==TRUE){
+      if(print_iter==TRUE & k %% 10 == 0){
         cat(sprintf('iteration = %i ', k))
         cat(sprintf('beta ='),beta,'\n')
-        cat(sprintf('Distance from estimateur from last iter ='),cstop,'\n')
+        cat(sprintf('Distance from last iteration ='),cstop,'\n')
       }
     }
-    var_obs = ll = ll1= ll2=std_obs =NULL
+    var_obs = ll = std_obs =NULL
     if(var_cal==TRUE){
       var_obs = louis_lr_saem(beta,mu,Sigma,y,X.obs,pos_var,rindic,whichcolmissing,mc.size=1000)
       std_obs <- sqrt(diag(var_obs))

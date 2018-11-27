@@ -12,54 +12,262 @@
 
 <meta name="author" content="Wei Jiang" />
 
-<meta name="date" content="2018-05-14" />
+<meta name="date" content="2018-11-27" />
 
-<title>SAEM for logistic regression with missing data</title>
+<title>Stochastic Approximation EM for Logistic Regression with Missing Values</title>
 
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 </head>
 
@@ -68,53 +276,31 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">SAEM for logistic regression with missing data</h1>
+<h1 class="title toc-ignore">Stochastic Approximation EM for Logistic Regression with Missing Values</h1>
 <h4 class="author"><em>Wei Jiang</em></h4>
-<h4 class="date"><em>2018-05-14</em></h4>
+<h4 class="date"><em>2018-11-27</em></h4>
 
 
 
 <div id="introduction-of-misaem" class="section level2">
 <h2>Introduction of misaem</h2>
-<p>misaem is a method to apply statistical inference for logistic regression model with missing data. This method is based on likelihood, including 1. A stochastic approximation version of EM algorithm based on Metropolis-Hasting sampling, to estimate the parameters of logistic regression. 2. Estimation of parameters’ variance based one Louis formula 3. Model selection procedure based on AIC or BIC</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(misaem)</code></pre></div>
+<p>misaem is a package to apply statistical inference for logistic regression model with missing data. This methodology is based on likelihood, including:</p>
+<ol style="list-style-type: decimal">
+<li>A stochastic approximation version of EM algorithm based on Metropolis-Hasting sampling, to estimate the parameters of logistic regression;</li>
+<li>Estimation of parameters’ variance based one Louis formula;</li>
+<li>Model selection procedure based on BIC.</li>
+</ol>
 </div>
-<div id="logistic-regression-model-and-missing-data" class="section level2">
-<h2>Logistic regression model and missing data</h2>
-<p>Let <span class="math inline">\((\by,\bx)\)</span> be the observed data with <span class="math inline">\(\by=(y_i , 1\leq i \leq n)\)</span> a <span class="math inline">\(n\)</span>-vector of binary responses coded with <span class="math inline">\(\{0, 1\}\)</span> and <span class="math inline">\(\bx= (x_{ij}, 1\leq i \leq n, 1 \leq j \leq p)\)</span> a <span class="math inline">\(n\times p\)</span> matrix of covariates where <span class="math inline">\(x_{ij}\)</span> takes its values in <span class="math inline">\(\mathbb{R}\)</span>.</p>
-The logistic regression model for binary classification can be specified as
-<span class="math display">\[\begin{equation} \label{regmodel}
-\prob{y_i=1|\bx_i;\bbeta}= 
-\frac{\exp(\beta_0 + \sum_{j=1}^p \beta_j x_{ij})}
-{ 1+\exp(\beta_0 + \sum_{j=1}^p \beta_j x_{ij}) }, 
-\quad i=1,\cdots,n. 
-\end{equation}\]</span>
-<p>where <span class="math inline">\(x_{i1},\ldots, x_{ip}\)</span> are the covariates for individual <span class="math inline">\(i\)</span> and <span class="math inline">\(\beta_0,\beta_1,\ldots,\beta_p\)</span> are real parameters.</p>
-Our main objective is to estimate the vector of parameters <span class="math inline">\(\bbeta=(\beta_j,0\leq j \leq p)\)</span> in the framework of missing values in the design matrix, i.e. in matrix <span class="math inline">\(\bx\)</span>. We adopt a probabilistic framework by assuming that <span class="math inline">\(\bx_i = (x_{i1},\ldots, x_{ip})\)</span> is normally distributed:
-<span class="math display">\[\begin{equation*}
-\bx_i \iid \mathcal{N}_p(\mu,\Sigma), \quad i=1,\cdots,n. 
-\end{equation*}\]</span>
-Let <span class="math inline">\(\theta=(\mu, \Sigma, \bbeta)\)</span> be the set of parameters of the model. Then, the log-likelihood for the complete data can be written as
-<span class="math display">\[\begin{equation*}
+<div id="synthetic-dataset" class="section level2">
+<h2>Synthetic dataset</h2>
+<p>We first generate a design matrix of size <span class="math inline">\(N=500\)</span> times <span class="math inline">\(p=5\)</span> by drawing each observation from a multivariate normal distribution <span class="math inline">\(\mathcal{N}(\mu, \Sigma)\)</span>. Then, we generate the response according to the logistic regression model.</p>
+<p>We consider as the true values for the parameters <span class="math display">\[\begin{equation*}
 \begin{split}
-\llike(\theta;\bx,\by) &amp; =\sum_{i=1}^n \llike(\theta;\bx_i,y_i) \\
-&amp;=\sum_{i=1}^n \Big( \log  (\dens(y_i|\bx_i;\bbeta))+\log (\dens(\bx_i;\mu,\Sigma)) \Big).
-\end{split}
-\end{equation*}\]</span>
-<p>Missing values are distributed in the design matrix and not in the response. For each individual <span class="math inline">\(i\)</span>, we note <span class="math inline">\(\xiobs\)</span> the elements of <span class="math inline">\(\bx_{i}\)</span> that are observed and <span class="math inline">\(\ximis\)</span> the elements that are missing. We also decompose the matrix of covariates as <span class="math inline">\(\bx = (\xobs,\xmis)\)</span> but keeping in mind that the missing elements may differ from one individual to another.</p>
-</div>
-<div id="simulation-study" class="section level2">
-<h2>Simulation study</h2>
-<p>We first generated a design matrix <span class="math inline">\(\bx\)</span> of size <span class="math inline">\(N=1000\)</span> times <span class="math inline">\(p=5\)</span> by drawing each observation from a multivariate normal distribution <span class="math inline">\(\mathcal{N}(\mu, \Sigma)\)</span>. Then, we generate the response according to the logistic regression model .</p>
-We consider as the true values for the parameters
-<span class="math display">\[\begin{equation*}
-\begin{split}
-\bbeta &amp;= (-0.2, 0.5, -0.3, 1, 0, -0.6),\\
+\beta &amp;= (0, 1, -1, 1, 0, -1),\\
 \mu &amp;= (1,2,3,4,5),\\
 \Sigma &amp;= \text{diag}(\sigma)C \text{diag}(\sigma),
 \end{split}
-\end{equation*}\]</span>
-<p>where the <span class="math inline">\(\sigma\)</span> is the vector of standard deviations <span class="math display">\[\sigma=(1,2,3,4,5)\]</span><br />
+\end{equation*}\]</span> where the <span class="math inline">\(\sigma\)</span> is the vector of standard deviations <span class="math display">\[\sigma=(1,2,3,4,5)\]</span><br />
 and <span class="math inline">\(C\)</span> the correlation matrix <span class="math display">\[C = \begin{bmatrix}
 1  &amp; 0.8 &amp; 0 &amp; 0 &amp;   0\\
 0.8 &amp; 1 &amp; 0 &amp; 0  &amp;  0\\
@@ -122,1275 +308,227 @@ and <span class="math inline">\(C\)</span> the correlation matrix <span class="m
 0 &amp; 0 &amp; 0.3 &amp; 1 &amp;  0.7\\
 0 &amp; 0 &amp; 0.6 &amp; 0.7 &amp;  1\\
 \end{bmatrix}.\]</span></p>
-<p>Then we randomly introduced 10% of missing values in the covariates according to the MCAR mechanism.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Generate dataset</span>
-N &lt;-<span class="st"> </span><span class="dv">1000</span>  <span class="co"># number of subjects</span>
-p &lt;-<span class="st"> </span><span class="dv">5</span>     <span class="co"># number of explanatory variables</span>
-mu.star &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>p  <span class="co">#rep(0,p)  # mean of the explanatory variables</span>
-sd &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>p <span class="co"># rep(1,p) # standard deviations</span>
-C &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(   <span class="co"># correlation matrix</span>
-<span class="dv">1</span>,   <span class="fl">0.8</span>, <span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">0</span>,
-<span class="fl">0.8</span>, <span class="dv">1</span>,   <span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">0</span>,
-<span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">1</span>,   <span class="fl">0.3</span>, <span class="fl">0.6</span>,
-<span class="dv">0</span>,   <span class="dv">0</span>,   <span class="fl">0.3</span>, <span class="dv">1</span>,   <span class="fl">0.7</span>,
-<span class="dv">0</span>,   <span class="dv">0</span>,   <span class="fl">0.6</span>, <span class="fl">0.7</span>, <span class="dv">1</span>), <span class="dt">nrow=</span>p)
-Sigma.star &lt;-<span class="st"> </span><span class="kw">diag</span>(sd)<span class="op">%*%</span>C<span class="op">%*%</span><span class="kw">diag</span>(sd) <span class="co"># variance-covariance matrix of the explanatory variables</span>
-beta.star &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.3</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="fl">0.6</span>) <span class="co"># coefficients</span>
-beta0.star &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">0.2</span>  <span class="co"># intercept</span>
-beta.true =<span class="st"> </span><span class="kw">c</span>(beta0.star,beta.star)
-X.complete &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(N<span class="op">*</span>p), <span class="dt">nrow=</span>N)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)
-             <span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,N), <span class="dt">nrow=</span>N, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>##         [,1] [,2] [,3] [,4] [,5]
-##    [1,]    1    2    3    4    5
-##    [2,]    1    2    3    4    5
-##    [3,]    1    2    3    4    5
-##    [4,]    1    2    3    4    5
-##    [5,]    1    2    3    4    5
-##    [6,]    1    2    3    4    5
-##    [7,]    1    2    3    4    5
-##    [8,]    1    2    3    4    5
-##    [9,]    1    2    3    4    5
-##   [10,]    1    2    3    4    5
-##   [11,]    1    2    3    4    5
-##   [12,]    1    2    3    4    5
-##   [13,]    1    2    3    4    5
-##   [14,]    1    2    3    4    5
-##   [15,]    1    2    3    4    5
-##   [16,]    1    2    3    4    5
-##   [17,]    1    2    3    4    5
-##   [18,]    1    2    3    4    5
-##   [19,]    1    2    3    4    5
-##   [20,]    1    2    3    4    5
-##   [21,]    1    2    3    4    5
-##   [22,]    1    2    3    4    5
-##   [23,]    1    2    3    4    5
-##   [24,]    1    2    3    4    5
-##   [25,]    1    2    3    4    5
-##   [26,]    1    2    3    4    5
-##   [27,]    1    2    3    4    5
-##   [28,]    1    2    3    4    5
-##   [29,]    1    2    3    4    5
-##   [30,]    1    2    3    4    5
-##   [31,]    1    2    3    4    5
-##   [32,]    1    2    3    4    5
-##   [33,]    1    2    3    4    5
-##   [34,]    1    2    3    4    5
-##   [35,]    1    2    3    4    5
-##   [36,]    1    2    3    4    5
-##   [37,]    1    2    3    4    5
-##   [38,]    1    2    3    4    5
-##   [39,]    1    2    3    4    5
-##   [40,]    1    2    3    4    5
-##   [41,]    1    2    3    4    5
-##   [42,]    1    2    3    4    5
-##   [43,]    1    2    3    4    5
-##   [44,]    1    2    3    4    5
-##   [45,]    1    2    3    4    5
-##   [46,]    1    2    3    4    5
-##   [47,]    1    2    3    4    5
-##   [48,]    1    2    3    4    5
-##   [49,]    1    2    3    4    5
-##   [50,]    1    2    3    4    5
-##   [51,]    1    2    3    4    5
-##   [52,]    1    2    3    4    5
-##   [53,]    1    2    3    4    5
-##   [54,]    1    2    3    4    5
-##   [55,]    1    2    3    4    5
-##   [56,]    1    2    3    4    5
-##   [57,]    1    2    3    4    5
-##   [58,]    1    2    3    4    5
-##   [59,]    1    2    3    4    5
-##   [60,]    1    2    3    4    5
-##   [61,]    1    2    3    4    5
-##   [62,]    1    2    3    4    5
-##   [63,]    1    2    3    4    5
-##   [64,]    1    2    3    4    5
-##   [65,]    1    2    3    4    5
-##   [66,]    1    2    3    4    5
-##   [67,]    1    2    3    4    5
-##   [68,]    1    2    3    4    5
-##   [69,]    1    2    3    4    5
-##   [70,]    1    2    3    4    5
-##   [71,]    1    2    3    4    5
-##   [72,]    1    2    3    4    5
-##   [73,]    1    2    3    4    5
-##   [74,]    1    2    3    4    5
-##   [75,]    1    2    3    4    5
-##   [76,]    1    2    3    4    5
-##   [77,]    1    2    3    4    5
-##   [78,]    1    2    3    4    5
-##   [79,]    1    2    3    4    5
-##   [80,]    1    2    3    4    5
-##   [81,]    1    2    3    4    5
-##   [82,]    1    2    3    4    5
-##   [83,]    1    2    3    4    5
-##   [84,]    1    2    3    4    5
-##   [85,]    1    2    3    4    5
-##   [86,]    1    2    3    4    5
-##   [87,]    1    2    3    4    5
-##   [88,]    1    2    3    4    5
-##   [89,]    1    2    3    4    5
-##   [90,]    1    2    3    4    5
-##   [91,]    1    2    3    4    5
-##   [92,]    1    2    3    4    5
-##   [93,]    1    2    3    4    5
-##   [94,]    1    2    3    4    5
-##   [95,]    1    2    3    4    5
-##   [96,]    1    2    3    4    5
-##   [97,]    1    2    3    4    5
-##   [98,]    1    2    3    4    5
-##   [99,]    1    2    3    4    5
-##  [100,]    1    2    3    4    5
-##  [101,]    1    2    3    4    5
-##  [102,]    1    2    3    4    5
-##  [103,]    1    2    3    4    5
-##  [104,]    1    2    3    4    5
-##  [105,]    1    2    3    4    5
-##  [106,]    1    2    3    4    5
-##  [107,]    1    2    3    4    5
-##  [108,]    1    2    3    4    5
-##  [109,]    1    2    3    4    5
-##  [110,]    1    2    3    4    5
-##  [111,]    1    2    3    4    5
-##  [112,]    1    2    3    4    5
-##  [113,]    1    2    3    4    5
-##  [114,]    1    2    3    4    5
-##  [115,]    1    2    3    4    5
-##  [116,]    1    2    3    4    5
-##  [117,]    1    2    3    4    5
-##  [118,]    1    2    3    4    5
-##  [119,]    1    2    3    4    5
-##  [120,]    1    2    3    4    5
-##  [121,]    1    2    3    4    5
-##  [122,]    1    2    3    4    5
-##  [123,]    1    2    3    4    5
-##  [124,]    1    2    3    4    5
-##  [125,]    1    2    3    4    5
-##  [126,]    1    2    3    4    5
-##  [127,]    1    2    3    4    5
-##  [128,]    1    2    3    4    5
-##  [129,]    1    2    3    4    5
-##  [130,]    1    2    3    4    5
-##  [131,]    1    2    3    4    5
-##  [132,]    1    2    3    4    5
-##  [133,]    1    2    3    4    5
-##  [134,]    1    2    3    4    5
-##  [135,]    1    2    3    4    5
-##  [136,]    1    2    3    4    5
-##  [137,]    1    2    3    4    5
-##  [138,]    1    2    3    4    5
-##  [139,]    1    2    3    4    5
-##  [140,]    1    2    3    4    5
-##  [141,]    1    2    3    4    5
-##  [142,]    1    2    3    4    5
-##  [143,]    1    2    3    4    5
-##  [144,]    1    2    3    4    5
-##  [145,]    1    2    3    4    5
-##  [146,]    1    2    3    4    5
-##  [147,]    1    2    3    4    5
-##  [148,]    1    2    3    4    5
-##  [149,]    1    2    3    4    5
-##  [150,]    1    2    3    4    5
-##  [151,]    1    2    3    4    5
-##  [152,]    1    2    3    4    5
-##  [153,]    1    2    3    4    5
-##  [154,]    1    2    3    4    5
-##  [155,]    1    2    3    4    5
-##  [156,]    1    2    3    4    5
-##  [157,]    1    2    3    4    5
-##  [158,]    1    2    3    4    5
-##  [159,]    1    2    3    4    5
-##  [160,]    1    2    3    4    5
-##  [161,]    1    2    3    4    5
-##  [162,]    1    2    3    4    5
-##  [163,]    1    2    3    4    5
-##  [164,]    1    2    3    4    5
-##  [165,]    1    2    3    4    5
-##  [166,]    1    2    3    4    5
-##  [167,]    1    2    3    4    5
-##  [168,]    1    2    3    4    5
-##  [169,]    1    2    3    4    5
-##  [170,]    1    2    3    4    5
-##  [171,]    1    2    3    4    5
-##  [172,]    1    2    3    4    5
-##  [173,]    1    2    3    4    5
-##  [174,]    1    2    3    4    5
-##  [175,]    1    2    3    4    5
-##  [176,]    1    2    3    4    5
-##  [177,]    1    2    3    4    5
-##  [178,]    1    2    3    4    5
-##  [179,]    1    2    3    4    5
-##  [180,]    1    2    3    4    5
-##  [181,]    1    2    3    4    5
-##  [182,]    1    2    3    4    5
-##  [183,]    1    2    3    4    5
-##  [184,]    1    2    3    4    5
-##  [185,]    1    2    3    4    5
-##  [186,]    1    2    3    4    5
-##  [187,]    1    2    3    4    5
-##  [188,]    1    2    3    4    5
-##  [189,]    1    2    3    4    5
-##  [190,]    1    2    3    4    5
-##  [191,]    1    2    3    4    5
-##  [192,]    1    2    3    4    5
-##  [193,]    1    2    3    4    5
-##  [194,]    1    2    3    4    5
-##  [195,]    1    2    3    4    5
-##  [196,]    1    2    3    4    5
-##  [197,]    1    2    3    4    5
-##  [198,]    1    2    3    4    5
-##  [199,]    1    2    3    4    5
-##  [200,]    1    2    3    4    5
-##  [201,]    1    2    3    4    5
-##  [202,]    1    2    3    4    5
-##  [203,]    1    2    3    4    5
-##  [204,]    1    2    3    4    5
-##  [205,]    1    2    3    4    5
-##  [206,]    1    2    3    4    5
-##  [207,]    1    2    3    4    5
-##  [208,]    1    2    3    4    5
-##  [209,]    1    2    3    4    5
-##  [210,]    1    2    3    4    5
-##  [211,]    1    2    3    4    5
-##  [212,]    1    2    3    4    5
-##  [213,]    1    2    3    4    5
-##  [214,]    1    2    3    4    5
-##  [215,]    1    2    3    4    5
-##  [216,]    1    2    3    4    5
-##  [217,]    1    2    3    4    5
-##  [218,]    1    2    3    4    5
-##  [219,]    1    2    3    4    5
-##  [220,]    1    2    3    4    5
-##  [221,]    1    2    3    4    5
-##  [222,]    1    2    3    4    5
-##  [223,]    1    2    3    4    5
-##  [224,]    1    2    3    4    5
-##  [225,]    1    2    3    4    5
-##  [226,]    1    2    3    4    5
-##  [227,]    1    2    3    4    5
-##  [228,]    1    2    3    4    5
-##  [229,]    1    2    3    4    5
-##  [230,]    1    2    3    4    5
-##  [231,]    1    2    3    4    5
-##  [232,]    1    2    3    4    5
-##  [233,]    1    2    3    4    5
-##  [234,]    1    2    3    4    5
-##  [235,]    1    2    3    4    5
-##  [236,]    1    2    3    4    5
-##  [237,]    1    2    3    4    5
-##  [238,]    1    2    3    4    5
-##  [239,]    1    2    3    4    5
-##  [240,]    1    2    3    4    5
-##  [241,]    1    2    3    4    5
-##  [242,]    1    2    3    4    5
-##  [243,]    1    2    3    4    5
-##  [244,]    1    2    3    4    5
-##  [245,]    1    2    3    4    5
-##  [246,]    1    2    3    4    5
-##  [247,]    1    2    3    4    5
-##  [248,]    1    2    3    4    5
-##  [249,]    1    2    3    4    5
-##  [250,]    1    2    3    4    5
-##  [251,]    1    2    3    4    5
-##  [252,]    1    2    3    4    5
-##  [253,]    1    2    3    4    5
-##  [254,]    1    2    3    4    5
-##  [255,]    1    2    3    4    5
-##  [256,]    1    2    3    4    5
-##  [257,]    1    2    3    4    5
-##  [258,]    1    2    3    4    5
-##  [259,]    1    2    3    4    5
-##  [260,]    1    2    3    4    5
-##  [261,]    1    2    3    4    5
-##  [262,]    1    2    3    4    5
-##  [263,]    1    2    3    4    5
-##  [264,]    1    2    3    4    5
-##  [265,]    1    2    3    4    5
-##  [266,]    1    2    3    4    5
-##  [267,]    1    2    3    4    5
-##  [268,]    1    2    3    4    5
-##  [269,]    1    2    3    4    5
-##  [270,]    1    2    3    4    5
-##  [271,]    1    2    3    4    5
-##  [272,]    1    2    3    4    5
-##  [273,]    1    2    3    4    5
-##  [274,]    1    2    3    4    5
-##  [275,]    1    2    3    4    5
-##  [276,]    1    2    3    4    5
-##  [277,]    1    2    3    4    5
-##  [278,]    1    2    3    4    5
-##  [279,]    1    2    3    4    5
-##  [280,]    1    2    3    4    5
-##  [281,]    1    2    3    4    5
-##  [282,]    1    2    3    4    5
-##  [283,]    1    2    3    4    5
-##  [284,]    1    2    3    4    5
-##  [285,]    1    2    3    4    5
-##  [286,]    1    2    3    4    5
-##  [287,]    1    2    3    4    5
-##  [288,]    1    2    3    4    5
-##  [289,]    1    2    3    4    5
-##  [290,]    1    2    3    4    5
-##  [291,]    1    2    3    4    5
-##  [292,]    1    2    3    4    5
-##  [293,]    1    2    3    4    5
-##  [294,]    1    2    3    4    5
-##  [295,]    1    2    3    4    5
-##  [296,]    1    2    3    4    5
-##  [297,]    1    2    3    4    5
-##  [298,]    1    2    3    4    5
-##  [299,]    1    2    3    4    5
-##  [300,]    1    2    3    4    5
-##  [301,]    1    2    3    4    5
-##  [302,]    1    2    3    4    5
-##  [303,]    1    2    3    4    5
-##  [304,]    1    2    3    4    5
-##  [305,]    1    2    3    4    5
-##  [306,]    1    2    3    4    5
-##  [307,]    1    2    3    4    5
-##  [308,]    1    2    3    4    5
-##  [309,]    1    2    3    4    5
-##  [310,]    1    2    3    4    5
-##  [311,]    1    2    3    4    5
-##  [312,]    1    2    3    4    5
-##  [313,]    1    2    3    4    5
-##  [314,]    1    2    3    4    5
-##  [315,]    1    2    3    4    5
-##  [316,]    1    2    3    4    5
-##  [317,]    1    2    3    4    5
-##  [318,]    1    2    3    4    5
-##  [319,]    1    2    3    4    5
-##  [320,]    1    2    3    4    5
-##  [321,]    1    2    3    4    5
-##  [322,]    1    2    3    4    5
-##  [323,]    1    2    3    4    5
-##  [324,]    1    2    3    4    5
-##  [325,]    1    2    3    4    5
-##  [326,]    1    2    3    4    5
-##  [327,]    1    2    3    4    5
-##  [328,]    1    2    3    4    5
-##  [329,]    1    2    3    4    5
-##  [330,]    1    2    3    4    5
-##  [331,]    1    2    3    4    5
-##  [332,]    1    2    3    4    5
-##  [333,]    1    2    3    4    5
-##  [334,]    1    2    3    4    5
-##  [335,]    1    2    3    4    5
-##  [336,]    1    2    3    4    5
-##  [337,]    1    2    3    4    5
-##  [338,]    1    2    3    4    5
-##  [339,]    1    2    3    4    5
-##  [340,]    1    2    3    4    5
-##  [341,]    1    2    3    4    5
-##  [342,]    1    2    3    4    5
-##  [343,]    1    2    3    4    5
-##  [344,]    1    2    3    4    5
-##  [345,]    1    2    3    4    5
-##  [346,]    1    2    3    4    5
-##  [347,]    1    2    3    4    5
-##  [348,]    1    2    3    4    5
-##  [349,]    1    2    3    4    5
-##  [350,]    1    2    3    4    5
-##  [351,]    1    2    3    4    5
-##  [352,]    1    2    3    4    5
-##  [353,]    1    2    3    4    5
-##  [354,]    1    2    3    4    5
-##  [355,]    1    2    3    4    5
-##  [356,]    1    2    3    4    5
-##  [357,]    1    2    3    4    5
-##  [358,]    1    2    3    4    5
-##  [359,]    1    2    3    4    5
-##  [360,]    1    2    3    4    5
-##  [361,]    1    2    3    4    5
-##  [362,]    1    2    3    4    5
-##  [363,]    1    2    3    4    5
-##  [364,]    1    2    3    4    5
-##  [365,]    1    2    3    4    5
-##  [366,]    1    2    3    4    5
-##  [367,]    1    2    3    4    5
-##  [368,]    1    2    3    4    5
-##  [369,]    1    2    3    4    5
-##  [370,]    1    2    3    4    5
-##  [371,]    1    2    3    4    5
-##  [372,]    1    2    3    4    5
-##  [373,]    1    2    3    4    5
-##  [374,]    1    2    3    4    5
-##  [375,]    1    2    3    4    5
-##  [376,]    1    2    3    4    5
-##  [377,]    1    2    3    4    5
-##  [378,]    1    2    3    4    5
-##  [379,]    1    2    3    4    5
-##  [380,]    1    2    3    4    5
-##  [381,]    1    2    3    4    5
-##  [382,]    1    2    3    4    5
-##  [383,]    1    2    3    4    5
-##  [384,]    1    2    3    4    5
-##  [385,]    1    2    3    4    5
-##  [386,]    1    2    3    4    5
-##  [387,]    1    2    3    4    5
-##  [388,]    1    2    3    4    5
-##  [389,]    1    2    3    4    5
-##  [390,]    1    2    3    4    5
-##  [391,]    1    2    3    4    5
-##  [392,]    1    2    3    4    5
-##  [393,]    1    2    3    4    5
-##  [394,]    1    2    3    4    5
-##  [395,]    1    2    3    4    5
-##  [396,]    1    2    3    4    5
-##  [397,]    1    2    3    4    5
-##  [398,]    1    2    3    4    5
-##  [399,]    1    2    3    4    5
-##  [400,]    1    2    3    4    5
-##  [401,]    1    2    3    4    5
-##  [402,]    1    2    3    4    5
-##  [403,]    1    2    3    4    5
-##  [404,]    1    2    3    4    5
-##  [405,]    1    2    3    4    5
-##  [406,]    1    2    3    4    5
-##  [407,]    1    2    3    4    5
-##  [408,]    1    2    3    4    5
-##  [409,]    1    2    3    4    5
-##  [410,]    1    2    3    4    5
-##  [411,]    1    2    3    4    5
-##  [412,]    1    2    3    4    5
-##  [413,]    1    2    3    4    5
-##  [414,]    1    2    3    4    5
-##  [415,]    1    2    3    4    5
-##  [416,]    1    2    3    4    5
-##  [417,]    1    2    3    4    5
-##  [418,]    1    2    3    4    5
-##  [419,]    1    2    3    4    5
-##  [420,]    1    2    3    4    5
-##  [421,]    1    2    3    4    5
-##  [422,]    1    2    3    4    5
-##  [423,]    1    2    3    4    5
-##  [424,]    1    2    3    4    5
-##  [425,]    1    2    3    4    5
-##  [426,]    1    2    3    4    5
-##  [427,]    1    2    3    4    5
-##  [428,]    1    2    3    4    5
-##  [429,]    1    2    3    4    5
-##  [430,]    1    2    3    4    5
-##  [431,]    1    2    3    4    5
-##  [432,]    1    2    3    4    5
-##  [433,]    1    2    3    4    5
-##  [434,]    1    2    3    4    5
-##  [435,]    1    2    3    4    5
-##  [436,]    1    2    3    4    5
-##  [437,]    1    2    3    4    5
-##  [438,]    1    2    3    4    5
-##  [439,]    1    2    3    4    5
-##  [440,]    1    2    3    4    5
-##  [441,]    1    2    3    4    5
-##  [442,]    1    2    3    4    5
-##  [443,]    1    2    3    4    5
-##  [444,]    1    2    3    4    5
-##  [445,]    1    2    3    4    5
-##  [446,]    1    2    3    4    5
-##  [447,]    1    2    3    4    5
-##  [448,]    1    2    3    4    5
-##  [449,]    1    2    3    4    5
-##  [450,]    1    2    3    4    5
-##  [451,]    1    2    3    4    5
-##  [452,]    1    2    3    4    5
-##  [453,]    1    2    3    4    5
-##  [454,]    1    2    3    4    5
-##  [455,]    1    2    3    4    5
-##  [456,]    1    2    3    4    5
-##  [457,]    1    2    3    4    5
-##  [458,]    1    2    3    4    5
-##  [459,]    1    2    3    4    5
-##  [460,]    1    2    3    4    5
-##  [461,]    1    2    3    4    5
-##  [462,]    1    2    3    4    5
-##  [463,]    1    2    3    4    5
-##  [464,]    1    2    3    4    5
-##  [465,]    1    2    3    4    5
-##  [466,]    1    2    3    4    5
-##  [467,]    1    2    3    4    5
-##  [468,]    1    2    3    4    5
-##  [469,]    1    2    3    4    5
-##  [470,]    1    2    3    4    5
-##  [471,]    1    2    3    4    5
-##  [472,]    1    2    3    4    5
-##  [473,]    1    2    3    4    5
-##  [474,]    1    2    3    4    5
-##  [475,]    1    2    3    4    5
-##  [476,]    1    2    3    4    5
-##  [477,]    1    2    3    4    5
-##  [478,]    1    2    3    4    5
-##  [479,]    1    2    3    4    5
-##  [480,]    1    2    3    4    5
-##  [481,]    1    2    3    4    5
-##  [482,]    1    2    3    4    5
-##  [483,]    1    2    3    4    5
-##  [484,]    1    2    3    4    5
-##  [485,]    1    2    3    4    5
-##  [486,]    1    2    3    4    5
-##  [487,]    1    2    3    4    5
-##  [488,]    1    2    3    4    5
-##  [489,]    1    2    3    4    5
-##  [490,]    1    2    3    4    5
-##  [491,]    1    2    3    4    5
-##  [492,]    1    2    3    4    5
-##  [493,]    1    2    3    4    5
-##  [494,]    1    2    3    4    5
-##  [495,]    1    2    3    4    5
-##  [496,]    1    2    3    4    5
-##  [497,]    1    2    3    4    5
-##  [498,]    1    2    3    4    5
-##  [499,]    1    2    3    4    5
-##  [500,]    1    2    3    4    5
-##  [501,]    1    2    3    4    5
-##  [502,]    1    2    3    4    5
-##  [503,]    1    2    3    4    5
-##  [504,]    1    2    3    4    5
-##  [505,]    1    2    3    4    5
-##  [506,]    1    2    3    4    5
-##  [507,]    1    2    3    4    5
-##  [508,]    1    2    3    4    5
-##  [509,]    1    2    3    4    5
-##  [510,]    1    2    3    4    5
-##  [511,]    1    2    3    4    5
-##  [512,]    1    2    3    4    5
-##  [513,]    1    2    3    4    5
-##  [514,]    1    2    3    4    5
-##  [515,]    1    2    3    4    5
-##  [516,]    1    2    3    4    5
-##  [517,]    1    2    3    4    5
-##  [518,]    1    2    3    4    5
-##  [519,]    1    2    3    4    5
-##  [520,]    1    2    3    4    5
-##  [521,]    1    2    3    4    5
-##  [522,]    1    2    3    4    5
-##  [523,]    1    2    3    4    5
-##  [524,]    1    2    3    4    5
-##  [525,]    1    2    3    4    5
-##  [526,]    1    2    3    4    5
-##  [527,]    1    2    3    4    5
-##  [528,]    1    2    3    4    5
-##  [529,]    1    2    3    4    5
-##  [530,]    1    2    3    4    5
-##  [531,]    1    2    3    4    5
-##  [532,]    1    2    3    4    5
-##  [533,]    1    2    3    4    5
-##  [534,]    1    2    3    4    5
-##  [535,]    1    2    3    4    5
-##  [536,]    1    2    3    4    5
-##  [537,]    1    2    3    4    5
-##  [538,]    1    2    3    4    5
-##  [539,]    1    2    3    4    5
-##  [540,]    1    2    3    4    5
-##  [541,]    1    2    3    4    5
-##  [542,]    1    2    3    4    5
-##  [543,]    1    2    3    4    5
-##  [544,]    1    2    3    4    5
-##  [545,]    1    2    3    4    5
-##  [546,]    1    2    3    4    5
-##  [547,]    1    2    3    4    5
-##  [548,]    1    2    3    4    5
-##  [549,]    1    2    3    4    5
-##  [550,]    1    2    3    4    5
-##  [551,]    1    2    3    4    5
-##  [552,]    1    2    3    4    5
-##  [553,]    1    2    3    4    5
-##  [554,]    1    2    3    4    5
-##  [555,]    1    2    3    4    5
-##  [556,]    1    2    3    4    5
-##  [557,]    1    2    3    4    5
-##  [558,]    1    2    3    4    5
-##  [559,]    1    2    3    4    5
-##  [560,]    1    2    3    4    5
-##  [561,]    1    2    3    4    5
-##  [562,]    1    2    3    4    5
-##  [563,]    1    2    3    4    5
-##  [564,]    1    2    3    4    5
-##  [565,]    1    2    3    4    5
-##  [566,]    1    2    3    4    5
-##  [567,]    1    2    3    4    5
-##  [568,]    1    2    3    4    5
-##  [569,]    1    2    3    4    5
-##  [570,]    1    2    3    4    5
-##  [571,]    1    2    3    4    5
-##  [572,]    1    2    3    4    5
-##  [573,]    1    2    3    4    5
-##  [574,]    1    2    3    4    5
-##  [575,]    1    2    3    4    5
-##  [576,]    1    2    3    4    5
-##  [577,]    1    2    3    4    5
-##  [578,]    1    2    3    4    5
-##  [579,]    1    2    3    4    5
-##  [580,]    1    2    3    4    5
-##  [581,]    1    2    3    4    5
-##  [582,]    1    2    3    4    5
-##  [583,]    1    2    3    4    5
-##  [584,]    1    2    3    4    5
-##  [585,]    1    2    3    4    5
-##  [586,]    1    2    3    4    5
-##  [587,]    1    2    3    4    5
-##  [588,]    1    2    3    4    5
-##  [589,]    1    2    3    4    5
-##  [590,]    1    2    3    4    5
-##  [591,]    1    2    3    4    5
-##  [592,]    1    2    3    4    5
-##  [593,]    1    2    3    4    5
-##  [594,]    1    2    3    4    5
-##  [595,]    1    2    3    4    5
-##  [596,]    1    2    3    4    5
-##  [597,]    1    2    3    4    5
-##  [598,]    1    2    3    4    5
-##  [599,]    1    2    3    4    5
-##  [600,]    1    2    3    4    5
-##  [601,]    1    2    3    4    5
-##  [602,]    1    2    3    4    5
-##  [603,]    1    2    3    4    5
-##  [604,]    1    2    3    4    5
-##  [605,]    1    2    3    4    5
-##  [606,]    1    2    3    4    5
-##  [607,]    1    2    3    4    5
-##  [608,]    1    2    3    4    5
-##  [609,]    1    2    3    4    5
-##  [610,]    1    2    3    4    5
-##  [611,]    1    2    3    4    5
-##  [612,]    1    2    3    4    5
-##  [613,]    1    2    3    4    5
-##  [614,]    1    2    3    4    5
-##  [615,]    1    2    3    4    5
-##  [616,]    1    2    3    4    5
-##  [617,]    1    2    3    4    5
-##  [618,]    1    2    3    4    5
-##  [619,]    1    2    3    4    5
-##  [620,]    1    2    3    4    5
-##  [621,]    1    2    3    4    5
-##  [622,]    1    2    3    4    5
-##  [623,]    1    2    3    4    5
-##  [624,]    1    2    3    4    5
-##  [625,]    1    2    3    4    5
-##  [626,]    1    2    3    4    5
-##  [627,]    1    2    3    4    5
-##  [628,]    1    2    3    4    5
-##  [629,]    1    2    3    4    5
-##  [630,]    1    2    3    4    5
-##  [631,]    1    2    3    4    5
-##  [632,]    1    2    3    4    5
-##  [633,]    1    2    3    4    5
-##  [634,]    1    2    3    4    5
-##  [635,]    1    2    3    4    5
-##  [636,]    1    2    3    4    5
-##  [637,]    1    2    3    4    5
-##  [638,]    1    2    3    4    5
-##  [639,]    1    2    3    4    5
-##  [640,]    1    2    3    4    5
-##  [641,]    1    2    3    4    5
-##  [642,]    1    2    3    4    5
-##  [643,]    1    2    3    4    5
-##  [644,]    1    2    3    4    5
-##  [645,]    1    2    3    4    5
-##  [646,]    1    2    3    4    5
-##  [647,]    1    2    3    4    5
-##  [648,]    1    2    3    4    5
-##  [649,]    1    2    3    4    5
-##  [650,]    1    2    3    4    5
-##  [651,]    1    2    3    4    5
-##  [652,]    1    2    3    4    5
-##  [653,]    1    2    3    4    5
-##  [654,]    1    2    3    4    5
-##  [655,]    1    2    3    4    5
-##  [656,]    1    2    3    4    5
-##  [657,]    1    2    3    4    5
-##  [658,]    1    2    3    4    5
-##  [659,]    1    2    3    4    5
-##  [660,]    1    2    3    4    5
-##  [661,]    1    2    3    4    5
-##  [662,]    1    2    3    4    5
-##  [663,]    1    2    3    4    5
-##  [664,]    1    2    3    4    5
-##  [665,]    1    2    3    4    5
-##  [666,]    1    2    3    4    5
-##  [667,]    1    2    3    4    5
-##  [668,]    1    2    3    4    5
-##  [669,]    1    2    3    4    5
-##  [670,]    1    2    3    4    5
-##  [671,]    1    2    3    4    5
-##  [672,]    1    2    3    4    5
-##  [673,]    1    2    3    4    5
-##  [674,]    1    2    3    4    5
-##  [675,]    1    2    3    4    5
-##  [676,]    1    2    3    4    5
-##  [677,]    1    2    3    4    5
-##  [678,]    1    2    3    4    5
-##  [679,]    1    2    3    4    5
-##  [680,]    1    2    3    4    5
-##  [681,]    1    2    3    4    5
-##  [682,]    1    2    3    4    5
-##  [683,]    1    2    3    4    5
-##  [684,]    1    2    3    4    5
-##  [685,]    1    2    3    4    5
-##  [686,]    1    2    3    4    5
-##  [687,]    1    2    3    4    5
-##  [688,]    1    2    3    4    5
-##  [689,]    1    2    3    4    5
-##  [690,]    1    2    3    4    5
-##  [691,]    1    2    3    4    5
-##  [692,]    1    2    3    4    5
-##  [693,]    1    2    3    4    5
-##  [694,]    1    2    3    4    5
-##  [695,]    1    2    3    4    5
-##  [696,]    1    2    3    4    5
-##  [697,]    1    2    3    4    5
-##  [698,]    1    2    3    4    5
-##  [699,]    1    2    3    4    5
-##  [700,]    1    2    3    4    5
-##  [701,]    1    2    3    4    5
-##  [702,]    1    2    3    4    5
-##  [703,]    1    2    3    4    5
-##  [704,]    1    2    3    4    5
-##  [705,]    1    2    3    4    5
-##  [706,]    1    2    3    4    5
-##  [707,]    1    2    3    4    5
-##  [708,]    1    2    3    4    5
-##  [709,]    1    2    3    4    5
-##  [710,]    1    2    3    4    5
-##  [711,]    1    2    3    4    5
-##  [712,]    1    2    3    4    5
-##  [713,]    1    2    3    4    5
-##  [714,]    1    2    3    4    5
-##  [715,]    1    2    3    4    5
-##  [716,]    1    2    3    4    5
-##  [717,]    1    2    3    4    5
-##  [718,]    1    2    3    4    5
-##  [719,]    1    2    3    4    5
-##  [720,]    1    2    3    4    5
-##  [721,]    1    2    3    4    5
-##  [722,]    1    2    3    4    5
-##  [723,]    1    2    3    4    5
-##  [724,]    1    2    3    4    5
-##  [725,]    1    2    3    4    5
-##  [726,]    1    2    3    4    5
-##  [727,]    1    2    3    4    5
-##  [728,]    1    2    3    4    5
-##  [729,]    1    2    3    4    5
-##  [730,]    1    2    3    4    5
-##  [731,]    1    2    3    4    5
-##  [732,]    1    2    3    4    5
-##  [733,]    1    2    3    4    5
-##  [734,]    1    2    3    4    5
-##  [735,]    1    2    3    4    5
-##  [736,]    1    2    3    4    5
-##  [737,]    1    2    3    4    5
-##  [738,]    1    2    3    4    5
-##  [739,]    1    2    3    4    5
-##  [740,]    1    2    3    4    5
-##  [741,]    1    2    3    4    5
-##  [742,]    1    2    3    4    5
-##  [743,]    1    2    3    4    5
-##  [744,]    1    2    3    4    5
-##  [745,]    1    2    3    4    5
-##  [746,]    1    2    3    4    5
-##  [747,]    1    2    3    4    5
-##  [748,]    1    2    3    4    5
-##  [749,]    1    2    3    4    5
-##  [750,]    1    2    3    4    5
-##  [751,]    1    2    3    4    5
-##  [752,]    1    2    3    4    5
-##  [753,]    1    2    3    4    5
-##  [754,]    1    2    3    4    5
-##  [755,]    1    2    3    4    5
-##  [756,]    1    2    3    4    5
-##  [757,]    1    2    3    4    5
-##  [758,]    1    2    3    4    5
-##  [759,]    1    2    3    4    5
-##  [760,]    1    2    3    4    5
-##  [761,]    1    2    3    4    5
-##  [762,]    1    2    3    4    5
-##  [763,]    1    2    3    4    5
-##  [764,]    1    2    3    4    5
-##  [765,]    1    2    3    4    5
-##  [766,]    1    2    3    4    5
-##  [767,]    1    2    3    4    5
-##  [768,]    1    2    3    4    5
-##  [769,]    1    2    3    4    5
-##  [770,]    1    2    3    4    5
-##  [771,]    1    2    3    4    5
-##  [772,]    1    2    3    4    5
-##  [773,]    1    2    3    4    5
-##  [774,]    1    2    3    4    5
-##  [775,]    1    2    3    4    5
-##  [776,]    1    2    3    4    5
-##  [777,]    1    2    3    4    5
-##  [778,]    1    2    3    4    5
-##  [779,]    1    2    3    4    5
-##  [780,]    1    2    3    4    5
-##  [781,]    1    2    3    4    5
-##  [782,]    1    2    3    4    5
-##  [783,]    1    2    3    4    5
-##  [784,]    1    2    3    4    5
-##  [785,]    1    2    3    4    5
-##  [786,]    1    2    3    4    5
-##  [787,]    1    2    3    4    5
-##  [788,]    1    2    3    4    5
-##  [789,]    1    2    3    4    5
-##  [790,]    1    2    3    4    5
-##  [791,]    1    2    3    4    5
-##  [792,]    1    2    3    4    5
-##  [793,]    1    2    3    4    5
-##  [794,]    1    2    3    4    5
-##  [795,]    1    2    3    4    5
-##  [796,]    1    2    3    4    5
-##  [797,]    1    2    3    4    5
-##  [798,]    1    2    3    4    5
-##  [799,]    1    2    3    4    5
-##  [800,]    1    2    3    4    5
-##  [801,]    1    2    3    4    5
-##  [802,]    1    2    3    4    5
-##  [803,]    1    2    3    4    5
-##  [804,]    1    2    3    4    5
-##  [805,]    1    2    3    4    5
-##  [806,]    1    2    3    4    5
-##  [807,]    1    2    3    4    5
-##  [808,]    1    2    3    4    5
-##  [809,]    1    2    3    4    5
-##  [810,]    1    2    3    4    5
-##  [811,]    1    2    3    4    5
-##  [812,]    1    2    3    4    5
-##  [813,]    1    2    3    4    5
-##  [814,]    1    2    3    4    5
-##  [815,]    1    2    3    4    5
-##  [816,]    1    2    3    4    5
-##  [817,]    1    2    3    4    5
-##  [818,]    1    2    3    4    5
-##  [819,]    1    2    3    4    5
-##  [820,]    1    2    3    4    5
-##  [821,]    1    2    3    4    5
-##  [822,]    1    2    3    4    5
-##  [823,]    1    2    3    4    5
-##  [824,]    1    2    3    4    5
-##  [825,]    1    2    3    4    5
-##  [826,]    1    2    3    4    5
-##  [827,]    1    2    3    4    5
-##  [828,]    1    2    3    4    5
-##  [829,]    1    2    3    4    5
-##  [830,]    1    2    3    4    5
-##  [831,]    1    2    3    4    5
-##  [832,]    1    2    3    4    5
-##  [833,]    1    2    3    4    5
-##  [834,]    1    2    3    4    5
-##  [835,]    1    2    3    4    5
-##  [836,]    1    2    3    4    5
-##  [837,]    1    2    3    4    5
-##  [838,]    1    2    3    4    5
-##  [839,]    1    2    3    4    5
-##  [840,]    1    2    3    4    5
-##  [841,]    1    2    3    4    5
-##  [842,]    1    2    3    4    5
-##  [843,]    1    2    3    4    5
-##  [844,]    1    2    3    4    5
-##  [845,]    1    2    3    4    5
-##  [846,]    1    2    3    4    5
-##  [847,]    1    2    3    4    5
-##  [848,]    1    2    3    4    5
-##  [849,]    1    2    3    4    5
-##  [850,]    1    2    3    4    5
-##  [851,]    1    2    3    4    5
-##  [852,]    1    2    3    4    5
-##  [853,]    1    2    3    4    5
-##  [854,]    1    2    3    4    5
-##  [855,]    1    2    3    4    5
-##  [856,]    1    2    3    4    5
-##  [857,]    1    2    3    4    5
-##  [858,]    1    2    3    4    5
-##  [859,]    1    2    3    4    5
-##  [860,]    1    2    3    4    5
-##  [861,]    1    2    3    4    5
-##  [862,]    1    2    3    4    5
-##  [863,]    1    2    3    4    5
-##  [864,]    1    2    3    4    5
-##  [865,]    1    2    3    4    5
-##  [866,]    1    2    3    4    5
-##  [867,]    1    2    3    4    5
-##  [868,]    1    2    3    4    5
-##  [869,]    1    2    3    4    5
-##  [870,]    1    2    3    4    5
-##  [871,]    1    2    3    4    5
-##  [872,]    1    2    3    4    5
-##  [873,]    1    2    3    4    5
-##  [874,]    1    2    3    4    5
-##  [875,]    1    2    3    4    5
-##  [876,]    1    2    3    4    5
-##  [877,]    1    2    3    4    5
-##  [878,]    1    2    3    4    5
-##  [879,]    1    2    3    4    5
-##  [880,]    1    2    3    4    5
-##  [881,]    1    2    3    4    5
-##  [882,]    1    2    3    4    5
-##  [883,]    1    2    3    4    5
-##  [884,]    1    2    3    4    5
-##  [885,]    1    2    3    4    5
-##  [886,]    1    2    3    4    5
-##  [887,]    1    2    3    4    5
-##  [888,]    1    2    3    4    5
-##  [889,]    1    2    3    4    5
-##  [890,]    1    2    3    4    5
-##  [891,]    1    2    3    4    5
-##  [892,]    1    2    3    4    5
-##  [893,]    1    2    3    4    5
-##  [894,]    1    2    3    4    5
-##  [895,]    1    2    3    4    5
-##  [896,]    1    2    3    4    5
-##  [897,]    1    2    3    4    5
-##  [898,]    1    2    3    4    5
-##  [899,]    1    2    3    4    5
-##  [900,]    1    2    3    4    5
-##  [901,]    1    2    3    4    5
-##  [902,]    1    2    3    4    5
-##  [903,]    1    2    3    4    5
-##  [904,]    1    2    3    4    5
-##  [905,]    1    2    3    4    5
-##  [906,]    1    2    3    4    5
-##  [907,]    1    2    3    4    5
-##  [908,]    1    2    3    4    5
-##  [909,]    1    2    3    4    5
-##  [910,]    1    2    3    4    5
-##  [911,]    1    2    3    4    5
-##  [912,]    1    2    3    4    5
-##  [913,]    1    2    3    4    5
-##  [914,]    1    2    3    4    5
-##  [915,]    1    2    3    4    5
-##  [916,]    1    2    3    4    5
-##  [917,]    1    2    3    4    5
-##  [918,]    1    2    3    4    5
-##  [919,]    1    2    3    4    5
-##  [920,]    1    2    3    4    5
-##  [921,]    1    2    3    4    5
-##  [922,]    1    2    3    4    5
-##  [923,]    1    2    3    4    5
-##  [924,]    1    2    3    4    5
-##  [925,]    1    2    3    4    5
-##  [926,]    1    2    3    4    5
-##  [927,]    1    2    3    4    5
-##  [928,]    1    2    3    4    5
-##  [929,]    1    2    3    4    5
-##  [930,]    1    2    3    4    5
-##  [931,]    1    2    3    4    5
-##  [932,]    1    2    3    4    5
-##  [933,]    1    2    3    4    5
-##  [934,]    1    2    3    4    5
-##  [935,]    1    2    3    4    5
-##  [936,]    1    2    3    4    5
-##  [937,]    1    2    3    4    5
-##  [938,]    1    2    3    4    5
-##  [939,]    1    2    3    4    5
-##  [940,]    1    2    3    4    5
-##  [941,]    1    2    3    4    5
-##  [942,]    1    2    3    4    5
-##  [943,]    1    2    3    4    5
-##  [944,]    1    2    3    4    5
-##  [945,]    1    2    3    4    5
-##  [946,]    1    2    3    4    5
-##  [947,]    1    2    3    4    5
-##  [948,]    1    2    3    4    5
-##  [949,]    1    2    3    4    5
-##  [950,]    1    2    3    4    5
-##  [951,]    1    2    3    4    5
-##  [952,]    1    2    3    4    5
-##  [953,]    1    2    3    4    5
-##  [954,]    1    2    3    4    5
-##  [955,]    1    2    3    4    5
-##  [956,]    1    2    3    4    5
-##  [957,]    1    2    3    4    5
-##  [958,]    1    2    3    4    5
-##  [959,]    1    2    3    4    5
-##  [960,]    1    2    3    4    5
-##  [961,]    1    2    3    4    5
-##  [962,]    1    2    3    4    5
-##  [963,]    1    2    3    4    5
-##  [964,]    1    2    3    4    5
-##  [965,]    1    2    3    4    5
-##  [966,]    1    2    3    4    5
-##  [967,]    1    2    3    4    5
-##  [968,]    1    2    3    4    5
-##  [969,]    1    2    3    4    5
-##  [970,]    1    2    3    4    5
-##  [971,]    1    2    3    4    5
-##  [972,]    1    2    3    4    5
-##  [973,]    1    2    3    4    5
-##  [974,]    1    2    3    4    5
-##  [975,]    1    2    3    4    5
-##  [976,]    1    2    3    4    5
-##  [977,]    1    2    3    4    5
-##  [978,]    1    2    3    4    5
-##  [979,]    1    2    3    4    5
-##  [980,]    1    2    3    4    5
-##  [981,]    1    2    3    4    5
-##  [982,]    1    2    3    4    5
-##  [983,]    1    2    3    4    5
-##  [984,]    1    2    3    4    5
-##  [985,]    1    2    3    4    5
-##  [986,]    1    2    3    4    5
-##  [987,]    1    2    3    4    5
-##  [988,]    1    2    3    4    5
-##  [989,]    1    2    3    4    5
-##  [990,]    1    2    3    4    5
-##  [991,]    1    2    3    4    5
-##  [992,]    1    2    3    4    5
-##  [993,]    1    2    3    4    5
-##  [994,]    1    2    3    4    5
-##  [995,]    1    2    3    4    5
-##  [996,]    1    2    3    4    5
-##  [997,]    1    2    3    4    5
-##  [998,]    1    2    3    4    5
-##  [999,]    1    2    3    4    5
-## [1000,]    1    2    3    4    5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.complete<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))
-y &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(N)<span class="op">&lt;</span>p1)
-
-<span class="co"># Generate missingness</span>
-p.miss &lt;-<span class="st"> </span><span class="fl">0.10</span>
-patterns &lt;-<span class="st"> </span><span class="kw">runif</span>(N<span class="op">*</span>p)<span class="op">&lt;</span>p.miss <span class="co">#missing completely at random</span>
-X.obs &lt;-<span class="st"> </span>X.complete
-X.obs[patterns] &lt;-<span class="st"> </span><span class="ot">NA</span>
-<span class="co"># SAEM</span>
-list.saem =<span class="st"> </span><span class="kw">miss.saem</span>(X.obs,y)</code></pre></div>
-<pre><code>## iteration = 1 beta = -0.2713557 0.2512869 -0.237063 0.8185484 -0.08364116 -0.4600474 
-## Distance from estimateur from last iter = 0.09177391 
-## iteration = 2 beta = -0.3182008 0.2340882 -0.2343669 0.9079807 -0.05942228 -0.5190213 
-## Distance from estimateur from last iter = 0.01456014 
-## iteration = 3 beta = -0.2986493 0.3956054 -0.2952477 0.9819589 -0.0516796 -0.5784259 
-## Distance from estimateur from last iter = 0.03923815 
-## iteration = 4 beta = -0.2679176 0.3112009 -0.2361263 0.9445297 -0.03722698 -0.564937 
-## Distance from estimateur from last iter = 0.01335568 
-## iteration = 5 beta = -0.2677419 0.2820829 -0.1959118 0.9913175 -0.03376019 -0.5850443 
-## Distance from estimateur from last iter = 0.005070525 
-## iteration = 6 beta = -0.3060794 0.3570361 -0.2637476 1.004704 -0.02562035 -0.6069354 
-## Distance from estimateur from last iter = 0.01241412 
-## iteration = 7 beta = -0.273676 0.268577 -0.2343293 0.9804983 -0.02581182 -0.5872111 
-## Distance from estimateur from last iter = 0.01071543 
-## iteration = 8 beta = -0.2869421 0.2465543 -0.2185146 0.9967971 -0.01159262 -0.6044004 
-## Distance from estimateur from last iter = 0.001674401 
-## iteration = 9 beta = -0.2920576 0.2641388 -0.2108263 0.983249 -0.02796797 -0.5926816 
-## Distance from estimateur from last iter = 0.000983524 
-## iteration = 10 beta = -0.285682 0.3132827 -0.2467409 1.02565 -0.01588023 -0.6209939 
-## Distance from estimateur from last iter = 0.006491157 
-## iteration = 11 beta = -0.3155547 0.3568114 -0.2702719 0.9800645 -0.06371611 -0.574825 
-## Distance from estimateur from last iter = 0.009838684 
-## iteration = 12 beta = -0.3194404 0.2475203 -0.2549425 1.032025 -0.01343466 -0.631112 
-## Distance from estimateur from last iter = 0.02059098 
-## iteration = 13 beta = -0.2925868 0.269192 -0.2495996 0.9892414 -0.03362776 -0.587346 
-## Distance from estimateur from last iter = 0.005372996 
-## iteration = 14 beta = -0.2565159 0.222158 -0.2095694 0.9420997 -0.02628676 -0.5674083 
-## Distance from estimateur from last iter = 0.007789469 
-## iteration = 15 beta = -0.2676696 0.357471 -0.2635958 0.9690159 -0.03990777 -0.5812423 
-## Distance from estimateur from last iter = 0.02245424 
-## iteration = 16 beta = -0.2887624 0.2241307 -0.210726 0.9713337 -0.02996955 -0.5817834 
-## Distance from estimateur from last iter = 0.02112418 
-## iteration = 17 beta = -0.2463588 0.2938174 -0.2264812 0.9631061 -0.0344539 -0.5857054 
-## Distance from estimateur from last iter = 0.007005715 
-## iteration = 18 beta = -0.2657065 0.1488249 -0.1840872 0.9883958 -0.0211497 -0.6008505 
-## Distance from estimateur from last iter = 0.02424036 
-## iteration = 19 beta = -0.2663617 0.2137284 -0.1957552 0.9378157 -0.03763519 -0.570665 
-## Distance from estimateur from last iter = 0.008090328 
-## iteration = 20 beta = -0.2968482 0.3624939 -0.2567704 0.9923871 -0.02545704 -0.6058431 
-## Distance from estimateur from last iter = 0.03114729 
-## iteration = 21 beta = -0.3167119 0.393029 -0.2774679 0.9695234 -0.02017806 -0.5885437 
-## Distance from estimateur from last iter = 0.002605234 
-## iteration = 22 beta = -0.3056753 0.4664026 -0.3203689 0.9854952 -0.03741695 -0.585844 
-## Distance from estimateur from last iter = 0.007905553 
-## iteration = 23 beta = -0.2574102 0.2844278 -0.2425648 0.9839721 -0.02937162 -0.5893213 
-## Distance from estimateur from last iter = 0.04157693 
-## iteration = 24 beta = -0.2648773 0.3142066 -0.2696921 0.9594782 -0.04796981 -0.5611855 
-## Distance from estimateur from last iter = 0.003415893 
-## iteration = 25 beta = -0.3055851 0.2957264 -0.249968 0.9938125 -0.02064698 -0.6008678 
-## Distance from estimateur from last iter = 0.00588775 
-## iteration = 26 beta = -0.293792 0.3126432 -0.2342395 0.9840539 -0.03202209 -0.5900718 
-## Distance from estimateur from last iter = 0.001013816 
-## iteration = 27 beta = -0.2819049 0.3781065 -0.2739923 0.9808317 -0.01755635 -0.5983573 
-## Distance from estimateur from last iter = 0.006295327 
-## iteration = 28 beta = -0.3079567 0.4058085 -0.2751682 0.9978752 -0.01545028 -0.6105785 
-## Distance from estimateur from last iter = 0.001891753 
-## iteration = 29 beta = -0.2893342 0.3238119 -0.2500121 1.031629 -0.03454696 -0.6066539 
-## Distance from estimateur from last iter = 0.009222493 
-## iteration = 30 beta = -0.2528102 0.2285461 -0.2078017 1.014613 -0.02631681 -0.6002963 
-## Distance from estimateur from last iter = 0.01258898 
-## iteration = 31 beta = -0.2800577 0.2315492 -0.2124819 0.9110598 -0.04903584 -0.5406849 
-## Distance from estimateur from last iter = 0.0155663 
-## iteration = 32 beta = -0.2574023 0.2731584 -0.2605068 0.9696814 -0.06460606 -0.5665686 
-## Distance from estimateur from last iter = 0.008899881 
-## iteration = 33 beta = -0.2849663 0.2784487 -0.2495813 1.009333 -0.03527171 -0.5971081 
-## Distance from estimateur from last iter = 0.004272567 
-## iteration = 34 beta = -0.2706296 0.32507 -0.2441919 1.018667 -0.005859692 -0.6270802 
-## Distance from estimateur from last iter = 0.004258655 
-## iteration = 35 beta = -0.2544123 0.3440279 -0.290987 0.9445841 -0.0309091 -0.575432 
-## Distance from estimateur from last iter = 0.01159551 
-## iteration = 36 beta = -0.2373956 0.3086666 -0.2504068 0.9537131 0.005740117 -0.5922016 
-## Distance from estimateur from last iter = 0.004894463 
-## iteration = 37 beta = -0.2358541 0.2978695 -0.2214063 0.9755618 -0.01875945 -0.592453 
-## Distance from estimateur from last iter = 0.002037643 
-## iteration = 38 beta = -0.2706154 0.2290001 -0.2071146 0.9715826 -0.02449119 -0.5900235 
-## Distance from estimateur from last iter = 0.006210186 
-## iteration = 39 beta = -0.279522 0.281488 -0.2270137 0.95057 -0.06378552 -0.5463682 
-## Distance from estimateur from last iter = 0.007121649 
-## iteration = 40 beta = -0.2650223 0.3244713 -0.2310328 0.9505636 -0.03747769 -0.571936 
-## Distance from estimateur from last iter = 0.003419775 
-## iteration = 41 beta = -0.311403 0.3601135 -0.2756351 1.011727 -0.03647578 -0.6031018 
-## Distance from estimateur from last iter = 0.01012417 
-## iteration = 42 beta = -0.2970693 0.4060898 -0.2899113 0.9873633 -0.01790956 -0.6060073 
-## Distance from estimateur from last iter = 0.003469824 
-## iteration = 43 beta = -0.2760215 0.4323891 -0.3172174 1.044232 -0.01211348 -0.6344917 
-## Distance from estimateur from last iter = 0.00595932 
-## iteration = 44 beta = -0.3261865 0.3694535 -0.2981595 1.037364 -0.03720185 -0.6143555 
-## Distance from estimateur from last iter = 0.00792269 
-## iteration = 45 beta = -0.257727 0.3222994 -0.2408788 0.9113283 -0.04647562 -0.5352342 
-## Distance from estimateur from last iter = 0.03242245 
-## iteration = 46 beta = -0.2366724 0.2709634 -0.2403226 0.9741726 -0.0427254 -0.5785769 
-## Distance from estimateur from last iter = 0.008921048 
-## iteration = 47 beta = -0.2760562 0.2610649 -0.2209336 0.9846266 -0.043597 -0.580468 
-## Distance from estimateur from last iter = 0.002138619 
-## iteration = 48 beta = -0.2690272 0.4062873 -0.2773409 1.001343 -0.014939 -0.6087428 
-## Distance from estimateur from last iter = 0.02622093 
-## iteration = 49 beta = -0.2566486 0.3092888 -0.2284592 1.006895 -0.01303449 -0.6103177 
-## Distance from estimateur from last iter = 0.01198828 
-## iteration = 50 beta = -0.2788096 0.3587 -0.29009 0.9755637 -0.05137983 -0.5713926 
-## Distance from estimateur from last iter = 0.01069807 
-## iteration = 51 beta = -0.2715298 0.3548438 -0.2790902 0.9884512 -0.05026014 -0.576877 
-## Distance from estimateur from last iter = 0.0003862829 
-## iteration = 52 beta = -0.2862416 0.3586832 -0.2784842 0.9908384 -0.04674344 -0.5785815 
-## Distance from estimateur from last iter = 0.0002525166 
-## iteration = 53 beta = -0.2965229 0.3396512 -0.2656832 0.9920322 -0.03881481 -0.5826659 
-## Distance from estimateur from last iter = 0.0007127564 
-## iteration = 54 beta = -0.2903813 0.3385261 -0.2605655 0.9948715 -0.03696564 -0.5853782 
-## Distance from estimateur from last iter = 8.40133e-05 
-## iteration = 55 beta = -0.2867358 0.330997 -0.2563794 0.996867 -0.04027 -0.5856052 
-## Distance from estimateur from last iter = 0.000102454 
-## iteration = 56 beta = -0.2854676 0.3426933 -0.2610196 0.9983228 -0.04245851 -0.5864757 
-## Distance from estimateur from last iter = 0.0001676081 
-## iteration = 57 beta = -0.2857733 0.3410536 -0.260737 0.9935076 -0.03977132 -0.588283 
-## Distance from estimateur from last iter = 3.653568e-05 
-## iteration = 58 beta = -0.2814022 0.348346 -0.2622365 0.9906344 -0.03999701 -0.5871323 
-## Distance from estimateur from last iter = 8.416484e-05 
-## iteration = 59 beta = -0.2811685 0.331518 -0.2545355 0.9899488 -0.03976655 -0.5868835 
-## Distance from estimateur from last iter = 0.0003431256 
-## iteration = 60 beta = -0.2832838 0.3448039 -0.2588038 0.9934048 -0.03992508 -0.5885693 
-## Distance from estimateur from last iter = 0.0002140168 
-## iteration = 61 beta = -0.2827707 0.3328942 -0.2510153 0.9943817 -0.03777403 -0.5913011 
-## Distance from estimateur from last iter = 0.0002158077 
-## iteration = 62 beta = -0.2806893 0.3265319 -0.2475044 0.9919265 -0.036881 -0.5902337 
-## Distance from estimateur from last iter = 6.510294e-05 
-## iteration = 63 beta = -0.2782219 0.3137518 -0.2418138 0.9908375 -0.0371227 -0.589326 
-## Distance from estimateur from last iter = 0.0002038689 
-## iteration = 64 beta = -0.2782633 0.3078088 -0.2380339 0.9893557 -0.03669804 -0.58878 
-## Distance from estimateur from last iter = 5.2283e-05 
-## iteration = 65 beta = -0.2803476 0.3052832 -0.2382492 0.9896108 -0.03731539 -0.5883604 
-## Distance from estimateur from last iter = 1.139137e-05 
-## iteration = 66 beta = -0.2796485 0.3039892 -0.2373532 0.9879888 -0.03818501 -0.5870799 
-## Distance from estimateur from last iter = 7.992606e-06 
-## iteration = 67 beta = -0.2785605 0.3018743 -0.2356183 0.9875798 -0.03745218 -0.5871788 
-## Distance from estimateur from last iter = 9.380581e-06 
-## iteration = 68 beta = -0.2783421 0.2956642 -0.2339047 0.9861276 -0.03750866 -0.5864683 
-## Distance from estimateur from last iter = 4.416606e-05 
-## iteration = 69 beta = -0.2764755 0.2987765 -0.2377953 0.9848325 -0.03722874 -0.5858121 
-## Distance from estimateur from last iter = 3.049385e-05 
-## iteration = 70 beta = -0.2762594 0.2978416 -0.23938 0.9839817 -0.03823041 -0.5849548 
-## Distance from estimateur from last iter = 5.894061e-06 
-## iteration = 71 beta = -0.2763679 0.2948167 -0.2383156 0.9828448 -0.03815735 -0.5848327 
-## Distance from estimateur from last iter = 1.160758e-05 
-## iteration = 72 beta = -0.2769576 0.2937327 -0.2384164 0.9821772 -0.0379594 -0.584661 
-## Distance from estimateur from last iter = 2.047274e-06 
-## iteration = 73 beta = -0.2778198 0.2960062 -0.2409791 0.9827517 -0.03788953 -0.5851498 
-## Distance from estimateur from last iter = 1.305387e-05 
-## iteration = 74 beta = -0.2774595 0.2982772 -0.2419653 0.9816457 -0.03716876 -0.5849965 
-## Distance from estimateur from last iter = 8.025916e-06 
-## iteration = 75 beta = -0.2784347 0.2997556 -0.2429792 0.9825685 -0.03700966 -0.5852002 
-## Distance from estimateur from last iter = 5.083202e-06 
-## iteration = 76 beta = -0.2781192 0.2972298 -0.2417518 0.9815734 -0.03753075 -0.5842839 
-## Distance from estimateur from last iter = 1.008684e-05 
-## iteration = 77 beta = -0.2782005 0.2995055 -0.2434409 0.9806641 -0.03754147 -0.5836637 
-## Distance from estimateur from last iter = 9.250186e-06 
-## iteration = 78 beta = -0.2793085 0.2965372 -0.2421723 0.9802986 -0.03684127 -0.5837668 
-## Distance from estimateur from last iter = 1.228244e-05 
-## iteration = 79 beta = -0.2793375 0.2998223 -0.2434828 0.9816224 -0.03588371 -0.5849518 
-## Distance from estimateur from last iter = 1.658319e-05 
-## iteration = 80 beta = -0.278524 0.3011656 -0.2439691 0.9827181 -0.03643667 -0.5852578 
-## Distance from estimateur from last iter = 4.302809e-06 
-## iteration = 81 beta = -0.278531 0.3005799 -0.2437914 0.9831619 -0.03629044 -0.5857583 
-## Distance from estimateur from last iter = 8.435339e-07 
-## iteration = 82 beta = -0.2767151 0.3015033 -0.2441737 0.9821587 -0.03597236 -0.5853762 
-## Distance from estimateur from last iter = 5.549987e-06 
-## iteration = 83 beta = -0.2769535 0.3017599 -0.2444036 0.9816445 -0.03552326 -0.5851952 
-## Distance from estimateur from last iter = 6.743951e-07 
-## iteration = 84 beta = -0.2771327 0.303697 -0.2453669 0.9814899 -0.03606529 -0.5849436 
-## Distance from estimateur from last iter = 5.09347e-06 
-## iteration = 85 beta = -0.2768187 0.3032129 -0.2446927 0.9814919 -0.03620314 -0.584897 
-## Distance from estimateur from last iter = 8.087035e-07 
-## iteration = 86 beta = -0.2774691 0.3012666 -0.2437513 0.9822004 -0.03689834 -0.5848422 
-## Distance from estimateur from last iter = 6.085502e-06 
-## iteration = 87 beta = -0.2778335 0.3032167 -0.2440798 0.9818912 -0.03687901 -0.5846587 
-## Distance from estimateur from last iter = 4.17307e-06 
-## iteration = 88 beta = -0.2771368 0.302154 -0.2436949 0.9818409 -0.03713378 -0.5843062 
-## Distance from estimateur from last iter = 1.954693e-06 
-## iteration = 89 beta = -0.2775776 0.2993789 -0.2425996 0.9816784 -0.03744395 -0.5839976 
-## Distance from estimateur from last iter = 9.312716e-06 
-## iteration = 90 beta = -0.2779914 0.2999339 -0.2433547 0.9823125 -0.03733726 -0.5845069 
-## Distance from estimateur from last iter = 1.722321e-06 
-## iteration = 91 beta = -0.2784329 0.3007225 -0.2437275 0.9816032 -0.03737417 -0.584147 
-## Distance from estimateur from last iter = 1.589674e-06 
-## iteration = 92 beta = -0.2786041 0.3013034 -0.2437213 0.9815798 -0.03667291 -0.5848004 
-## Distance from estimateur from last iter = 1.285997e-06 
-## iteration = 93 beta = -0.2787904 0.3017592 -0.2439796 0.9818794 -0.03640885 -0.5850915 
-## Distance from estimateur from last iter = 5.534565e-07 
-## iteration = 94 beta = -0.2799716 0.3033564 -0.2445137 0.983202 -0.03613052 -0.5858666 
-## Distance from estimateur from last iter = 6.658915e-06 
-## iteration = 95 beta = -0.2793564 0.3040971 -0.245013 0.9838532 -0.03640597 -0.5859681 
-## Distance from estimateur from last iter = 1.68653e-06 
-## iteration = 96 beta = -0.2800259 0.3056053 -0.2456822 0.9845161 -0.03640707 -0.5863447 
-## Distance from estimateur from last iter = 3.752119e-06 
-## iteration = 97 beta = -0.2803471 0.3045588 -0.2450886 0.985033 -0.03596846 -0.5868894 
-## Distance from estimateur from last iter = 2.307046e-06 
-## iteration = 98 beta = -0.2797173 0.3055909 -0.2454428 0.9851531 -0.03584367 -0.5870596 
-## Distance from estimateur from last iter = 1.646357e-06 
-## iteration = 99 beta = -0.2793529 0.3070433 -0.2459623 0.9842919 -0.03581035 -0.5867486 
-## Distance from estimateur from last iter = 3.351576e-06 
-## iteration = 100 beta = -0.2797181 0.3059249 -0.2453969 0.9846444 -0.0358235 -0.5866407 
-## Distance from estimateur from last iter = 1.840017e-06 
-## iteration = 101 beta = -0.280293 0.3072653 -0.2461707 0.9846791 -0.03581152 -0.5865421 
-## Distance from estimateur from last iter = 2.737079e-06 
-## iteration = 102 beta = -0.2796689 0.3085371 -0.2463366 0.9838814 -0.03609142 -0.5859808 
-## Distance from estimateur from last iter = 3.064343e-06 
-## iteration = 103 beta = -0.2802728 0.3091458 -0.2468216 0.9839926 -0.03596527 -0.5860541 
-## Distance from estimateur from last iter = 1.003982e-06 
-## iteration = 104 beta = -0.2804388 0.3092927 -0.2467075 0.9841109 -0.03638356 -0.5858656 
-## Distance from estimateur from last iter = 2.866869e-07 
-## iteration = 105 beta = -0.2800539 0.3083406 -0.2465789 0.9839865 -0.03588095 -0.5860504 
-## Distance from estimateur from last iter = 1.373483e-06 
-## iteration = 106 beta = -0.2796839 0.3066788 -0.2465592 0.9834041 -0.035915 -0.5858009 
-## Distance from estimateur from last iter = 3.30142e-06 
-## iteration = 107 beta = -0.2800879 0.3071858 -0.247006 0.9838741 -0.03557475 -0.5862754 
-## Distance from estimateur from last iter = 1.181793e-06 
-## iteration = 108 beta = -0.2810494 0.3080595 -0.247909 0.9839657 -0.03556403 -0.5862289 
-## Distance from estimateur from last iter = 2.513791e-06 
-## iteration = 109 beta = -0.2802967 0.3080059 -0.2476579 0.9833716 -0.03581934 -0.5856492 
-## Distance from estimateur from last iter = 1.386718e-06 
-## iteration = 110 beta = -0.2799436 0.3098474 -0.2487601 0.9835198 -0.03581978 -0.5856981 
-## Distance from estimateur from last iter = 4.755201e-06 
-## iteration = 111 beta = -0.2799146 0.3112491 -0.2489596 0.9832379 -0.03605499 -0.5853077 
-## Distance from estimateur from last iter = 2.292661e-06 
-## iteration = 112 beta = -0.2800728 0.3120471 -0.2493321 0.9837197 -0.03609964 -0.5855434 
-## Distance from estimateur from last iter = 1.090194e-06 
-## iteration = 113 beta = -0.2798005 0.3123518 -0.249916 0.9839136 -0.03610512 -0.5856193 
-## Distance from estimateur from last iter = 5.512755e-07 
-## iteration = 114 beta = -0.2793021 0.31214 -0.24991 0.9839339 -0.03606276 -0.5856905 
-## Distance from estimateur from last iter = 3.00524e-07 
-## iteration = 115 beta = -0.2793404 0.3143499 -0.2512165 0.9839384 -0.03589867 -0.5858644 
-## Distance from estimateur from last iter = 6.649139e-06 
-## iteration = 116 beta = -0.2790563 0.3143684 -0.2508344 0.9836395 -0.03586273 -0.5857717 
-## Distance from estimateur from last iter = 3.262825e-07 
-## iteration = 117 beta = -0.2787957 0.3141086 -0.2507576 0.9839454 -0.0358697 -0.5859352 
-## Distance from estimateur from last iter = 2.616623e-07 
-## iteration = 118 beta = -0.2788361 0.3140922 -0.2509471 0.9837094 -0.03610241 -0.5856475 
-## Distance from estimateur from last iter = 2.304123e-07 
-## iteration = 119 beta = -0.2788765 0.314242 -0.251038 0.9835759 -0.03613434 -0.5855849 
-## Distance from estimateur from last iter = 5.504668e-08</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(list.saem<span class="op">$</span>beta)</code></pre></div>
-<pre><code>## [1] -0.27887647  0.31424197 -0.25103795  0.98357594 -0.03613434 -0.58558494</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># Generate dataset</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">N &lt;-<span class="st"> </span><span class="dv">500</span>  <span class="co"># number of subjects</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">p &lt;-<span class="st"> </span><span class="dv">5</span>     <span class="co"># number of explanatory variables</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">mu.star &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>p  <span class="co">#rep(0,p)  # mean of the explanatory variables</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">sd &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>p <span class="co"># rep(1,p) # standard deviations</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">C &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(   <span class="co"># correlation matrix</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="dv">1</span>,   <span class="fl">0.8</span>, <span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="fl">0.8</span>, <span class="dv">1</span>,   <span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="dv">0</span>,   <span class="dv">0</span>,   <span class="dv">1</span>,   <span class="fl">0.3</span>, <span class="fl">0.6</span>,</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="dv">0</span>,   <span class="dv">0</span>,   <span class="fl">0.3</span>, <span class="dv">1</span>,   <span class="fl">0.7</span>,</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="dv">0</span>,   <span class="dv">0</span>,   <span class="fl">0.6</span>, <span class="fl">0.7</span>, <span class="dv">1</span>), <span class="dt">nrow=</span>p)</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">Sigma.star &lt;-<span class="st"> </span><span class="kw">diag</span>(sd)<span class="op">%*%</span>C<span class="op">%*%</span><span class="kw">diag</span>(sd) <span class="co"># covariance matrix</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">beta.star &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">-1</span>) <span class="co"># coefficients</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15">beta0.star &lt;-<span class="st"> </span><span class="dv">0</span>  <span class="co"># intercept</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16">beta.true =<span class="st"> </span><span class="kw">c</span>(beta0.star,beta.star)</a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co"># Design matrix</span></a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">X.complete &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(N<span class="op">*</span>p), <span class="dt">nrow=</span>N)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)<span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,N), <span class="dt">nrow=</span>N, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="co"># Reponse vector</span></a>
+<a class="sourceLine" id="cb1-22" data-line-number="22">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.complete<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))</a>
+<a class="sourceLine" id="cb1-23" data-line-number="23">y &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(N)<span class="op">&lt;</span>p1)</a></code></pre></div>
+<p>Then we randomly introduced 10% of missing values in the covariates according to the MCAR (Missing completelu at random) mechanism.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># Generate missingness</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">p.miss &lt;-<span class="st"> </span><span class="fl">0.10</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">patterns &lt;-<span class="st"> </span><span class="kw">runif</span>(N<span class="op">*</span>p)<span class="op">&lt;</span>p.miss <span class="co"># missing completely at random</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">X.obs &lt;-<span class="st"> </span>X.complete</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">X.obs[patterns] &lt;-<span class="st"> </span><span class="ot">NA</span></a></code></pre></div>
+<p>Have a look at our synthetic dataset:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">head</span>(X.obs)</a></code></pre></div>
+<pre><code>##           [,1]        [,2]      [,3]         [,4]        [,5]
+## [1,] 1.0847563  1.71119812 5.0779956  9.731254821 13.02285225
+## [2,] 1.2264603  0.04664033 5.3758000  6.383093558  4.84730504
+## [3,] 1.4325565  1.77934455        NA  8.421927692  7.26902254
+## [4,] 1.5580652  5.69782193 5.5942869 -0.440749372 -0.96662931
+## [5,] 1.0597553 -0.38470918 0.4462986  0.008402997  0.04745022
+## [6,] 0.8853591  0.56839374 3.4641522  7.047389616          NA</code></pre>
+</div>
+<div id="main-usage-estimation-for-logistic-regression-with-missingness" class="section level2">
+<h2>Main usage: Estimation for logistic regression with missingness</h2>
+<p>The main function in our package is <code>miss.saem</code> function, which returns the estimation of parameters for logistic regression with missingness. Here we apply this function with its default options.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co">#Charge library</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">library</span>(misaem)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co"># SAEM</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">list.saem =<span class="st"> </span><span class="kw">miss.saem</span>(X.obs,y)</a></code></pre></div>
+<pre><code>## iteration = 10 beta = 0.07193013 0.8621059 -0.9593602 1.188501 -0.00691982 -1.115174 
+## Distance from last iteration = 0.002800532 
+## iteration = 20 beta = -0.03136551 1.256794 -1.12295 1.180936 -0.009885152 -1.114326 
+## Distance from last iteration = 0.0176632 
+## iteration = 30 beta = 0.02075442 1.16449 -1.021039 1.162069 -0.01682317 -1.099308 
+## Distance from last iteration = 0.1218524 
+## iteration = 40 beta = 0.1477152 1.073935 -1.095803 1.173065 -0.02928672 -1.099446 
+## Distance from last iteration = 0.1414668 
+## iteration = 50 beta = 0.1205986 1.113298 -0.9688564 1.041548 -0.06052164 -0.9799622 
+## Distance from last iteration = 0.1737565 
+## iteration = 60 beta = 0.1129732 1.013455 -0.9389359 1.027017 -0.05479268 -0.9524152 
+## Distance from last iteration = 3.076897e-05 
+## iteration = 70 beta = 0.07847484 1.023609 -0.9626167 1.038256 -0.04132143 -0.9646895 
+## Distance from last iteration = 0.0002820075 
+## iteration = 80 beta = 0.07095625 1.070815 -0.9922385 1.053396 -0.04173298 -0.980045 
+## Distance from last iteration = 5.67119e-05 
+## iteration = 90 beta = 0.07070879 1.089326 -1.010678 1.072014 -0.03172497 -1.007943 
+## Distance from last iteration = 7.494584e-05 
+## iteration = 100 beta = 0.06932229 1.107081 -1.022656 1.081968 -0.03006122 -1.017227 
+## Distance from last iteration = 1.828823e-05 
+## iteration = 110 beta = 0.06329327 1.116114 -1.028553 1.089239 -0.0295718 -1.025201 
+## Distance from last iteration = 1.094912e-06 
+## iteration = 120 beta = 0.06704591 1.124846 -1.035163 1.090537 -0.02853558 -1.026653 
+## Distance from last iteration = 1.048773e-05 
+## iteration = 130 beta = 0.06694411 1.125318 -1.033447 1.086222 -0.02904691 -1.024076 
+## Distance from last iteration = 1.398283e-05 
+## iteration = 140 beta = 0.06392523 1.117632 -1.02875 1.085534 -0.02812343 -1.024316 
+## Distance from last iteration = 2.058142e-05 
+## iteration = 150 beta = 0.05796131 1.11061 -1.026311 1.085827 -0.02504412 -1.025536 
+## Distance from last iteration = 1.077455e-05 
+## iteration = 160 beta = 0.06594651 1.109383 -1.027915 1.085974 -0.0271385 -1.024832 
+## Distance from last iteration = 2.593489e-06 
+## iteration = 170 beta = 0.07014832 1.114645 -1.031966 1.086403 -0.02695946 -1.025621 
+## Distance from last iteration = 5.779123e-06 
+## iteration = 180 beta = 0.0696883 1.118459 -1.033234 1.085297 -0.02696528 -1.02516 
+## Distance from last iteration = 4.383226e-06 
+## iteration = 190 beta = 0.06977064 1.120923 -1.035369 1.086957 -0.02654733 -1.02698 
+## Distance from last iteration = 2.213467e-06 
+## iteration = 200 beta = 0.07263775 1.126912 -1.039287 1.087265 -0.02704987 -1.027656 
+## Distance from last iteration = 7.281153e-07</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">print</span>(list.saem<span class="op">$</span>beta)</a></code></pre></div>
+<pre><code>## [1]  0.07295149  1.12523513 -1.03819294  1.08639345 -0.02713150 -1.02667062</code></pre>
+<p>And if you need to obtain the variance of estimation:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># SAEM with variance estimation</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">list.saem =<span class="st"> </span><span class="kw">miss.saem</span>(X.obs,y,<span class="dt">var_cal =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## iteration = 10 beta = 0.07193013 0.8621059 -0.9593602 1.188501 -0.00691982 -1.115174 
+## Distance from last iteration = 0.002800532 
+## iteration = 20 beta = -0.03136551 1.256794 -1.12295 1.180936 -0.009885152 -1.114326 
+## Distance from last iteration = 0.0176632 
+## iteration = 30 beta = 0.02075442 1.16449 -1.021039 1.162069 -0.01682317 -1.099308 
+## Distance from last iteration = 0.1218524 
+## iteration = 40 beta = 0.1477152 1.073935 -1.095803 1.173065 -0.02928672 -1.099446 
+## Distance from last iteration = 0.1414668 
+## iteration = 50 beta = 0.1205986 1.113298 -0.9688564 1.041548 -0.06052164 -0.9799622 
+## Distance from last iteration = 0.1737565 
+## iteration = 60 beta = 0.1129732 1.013455 -0.9389359 1.027017 -0.05479268 -0.9524152 
+## Distance from last iteration = 3.076897e-05 
+## iteration = 70 beta = 0.07847484 1.023609 -0.9626167 1.038256 -0.04132143 -0.9646895 
+## Distance from last iteration = 0.0002820075 
+## iteration = 80 beta = 0.07095625 1.070815 -0.9922385 1.053396 -0.04173298 -0.980045 
+## Distance from last iteration = 5.67119e-05 
+## iteration = 90 beta = 0.07070879 1.089326 -1.010678 1.072014 -0.03172497 -1.007943 
+## Distance from last iteration = 7.494584e-05 
+## iteration = 100 beta = 0.06932229 1.107081 -1.022656 1.081968 -0.03006122 -1.017227 
+## Distance from last iteration = 1.828823e-05 
+## iteration = 110 beta = 0.06329327 1.116114 -1.028553 1.089239 -0.0295718 -1.025201 
+## Distance from last iteration = 1.094912e-06 
+## iteration = 120 beta = 0.06704591 1.124846 -1.035163 1.090537 -0.02853558 -1.026653 
+## Distance from last iteration = 1.048773e-05 
+## iteration = 130 beta = 0.06694411 1.125318 -1.033447 1.086222 -0.02904691 -1.024076 
+## Distance from last iteration = 1.398283e-05 
+## iteration = 140 beta = 0.06392523 1.117632 -1.02875 1.085534 -0.02812343 -1.024316 
+## Distance from last iteration = 2.058142e-05 
+## iteration = 150 beta = 0.05796131 1.11061 -1.026311 1.085827 -0.02504412 -1.025536 
+## Distance from last iteration = 1.077455e-05 
+## iteration = 160 beta = 0.06594651 1.109383 -1.027915 1.085974 -0.0271385 -1.024832 
+## Distance from last iteration = 2.593489e-06 
+## iteration = 170 beta = 0.07014832 1.114645 -1.031966 1.086403 -0.02695946 -1.025621 
+## Distance from last iteration = 5.779123e-06 
+## iteration = 180 beta = 0.0696883 1.118459 -1.033234 1.085297 -0.02696528 -1.02516 
+## Distance from last iteration = 4.383226e-06 
+## iteration = 190 beta = 0.06977064 1.120923 -1.035369 1.086957 -0.02654733 -1.02698 
+## Distance from last iteration = 2.213467e-06 
+## iteration = 200 beta = 0.07263775 1.126912 -1.039287 1.087265 -0.02704987 -1.027656 
+## Distance from last iteration = 7.281153e-07</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">print</span>(list.saem<span class="op">$</span>beta)</a></code></pre></div>
+<pre><code>## [1]  0.07295149  1.12523513 -1.03819294  1.08639345 -0.02713150 -1.02667062</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">print</span>(list.saem<span class="op">$</span>var_obs)</a></code></pre></div>
+<pre><code>##               [,1]        [,2]          [,3]         [,4]          [,5]
+## [1,]  0.1045912507 -0.01640825 -8.015102e-03 -0.007844460 -6.446553e-03
+## [2,] -0.0164082517  0.14023540 -6.540748e-02  0.011371833 -1.119750e-03
+## [3,] -0.0080151020 -0.06540748  4.229590e-02 -0.012590862  8.142047e-05
+## [4,] -0.0078444600  0.01137183 -1.259086e-02  0.020041181  2.209681e-03
+## [5,] -0.0064465534 -0.00111975  8.142047e-05  0.002209681  4.480773e-03
+## [6,]  0.0005674298 -0.01229699  1.228287e-02 -0.017117600 -4.048477e-03
+##               [,6]
+## [1,]  0.0005674298
+## [2,] -0.0122969901
+## [3,]  0.0122828659
+## [4,] -0.0171176002
+## [5,] -0.0040484767
+## [6,]  0.0185079131</code></pre>
+</div>
+<div id="model-selection-with-missing-values" class="section level2">
+<h2>Model selection with missing values</h2>
+<p>To perform model selection with missing values, we adapt criterion BIC and stepwise method. The function <code>model_selection</code> will return the index of variates included in the best model selected, and also the estimates for the best model. Pay attention that here the dimension of dataset should be less than 20 to avoid blocking your computer.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># model selection for SAEM</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">list.saem.select =<span class="st"> </span><span class="kw">model_selection</span>(X.obs,y)</a></code></pre></div>
+<pre><code>## iteration = 10 beta = 0.03693459 0.9922979 -0.9512952 1.089339 0 -1.028696 
+## Distance from last iteration = 0.0005214435 
+## iteration = 20 beta = 0.02679083 1.016159 -0.9809538 1.108529 0 -1.053341 
+## Distance from last iteration = 0.0001119514 
+## iteration = 30 beta = 0.00634951 1.026026 -0.9844437 1.112693 0 -1.056097 
+## Distance from last iteration = 8.295187e-05 
+## iteration = 40 beta = 0.03240261 1.067195 -1.017125 1.128108 0 -1.073618 
+## Distance from last iteration = 3.896732e-06 
+## iteration = 50 beta = 0.0346749 1.056908 -1.010936 1.125084 0 -1.072799 
+## Distance from last iteration = 1.076438e-05 
+## iteration = 60 beta = 0.03256774 1.046976 -1.00047 1.115547 0 -1.062582 
+## Distance from last iteration = 7.940021e-06 
+## iteration = 70 beta = 0.02659178 1.046861 -1.000536 1.109275 0 -1.055039 
+## Distance from last iteration = 1.453078e-05 
+## iteration = 80 beta = 0.02337511 1.058919 -1.005586 1.108637 0 -1.054648 
+## Distance from last iteration = 5.774576e-06 
+## iteration = 90 beta = 0.02881635 1.068504 -1.012951 1.112225 0 -1.060291 
+## Distance from last iteration = 1.514593e-05 
+## iteration = 100 beta = 0.02948875 1.076905 -1.017599 1.114678 0 -1.062922 
+## Distance from last iteration = 4.426403e-06 
+## iteration = 110 beta = 0.02584919 1.08304 -1.020688 1.116973 0 -1.065361 
+## Distance from last iteration = 4.719359e-07 
+## iteration = 120 beta = 0.02857304 1.088741 -1.024188 1.116082 0 -1.064399 
+## Distance from last iteration = 2.546118e-06 
+## iteration = 130 beta = 0.02843074 1.090349 -1.023225 1.112404 0 -1.062091 
+## Distance from last iteration = 4.238248e-06 
+## iteration = 140 beta = 0.02703252 1.088101 -1.021314 1.111167 0 -1.061152 
+## Distance from last iteration = 6.07387e-06 
+## iteration = 150 beta = 0.02457677 1.085172 -1.020317 1.110807 0 -1.060302 
+## Distance from last iteration = 5.800769e-06</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">print</span>(list.saem.select<span class="op">$</span>subset_choose)</a></code></pre></div>
+<pre><code>## [1] 1 2 3 5</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">print</span>(list.saem.select<span class="op">$</span>beta)</a></code></pre></div>
+<pre><code>## [1]  0.02480092  1.08537618 -1.02082832  1.11083772  0.00000000 -1.06022232</code></pre>
+</div>
+<div id="prediction-on-test-set" class="section level2">
+<h2>Prediction on test set</h2>
+<p>In order to evaluate the prediction performance, we generate a test set of size <span class="math inline">\(Nt=100\)</span> times <span class="math inline">\(p=5\)</span> follow the same distribution as previous design matrix, and also with 10% of missing values. Given the real value of response according to the logistic regression model, we can evaluate the prediction results by a confusion matrix.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># Generate test set with missingness</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">200</span>)</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">Nt =<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">X.test &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(Nt<span class="op">*</span>p), <span class="dt">nrow=</span>Nt)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)<span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,Nt), <span class="dt">nrow=</span>Nt, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co"># Real value for response of test set</span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.test<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))</a>
+<a class="sourceLine" id="cb21-8" data-line-number="8">y.test &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(Nt)<span class="op">&lt;</span>p1)</a>
+<a class="sourceLine" id="cb21-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb21-10" data-line-number="10"><span class="co"># Generate missingness on test set</span></a>
+<a class="sourceLine" id="cb21-11" data-line-number="11">p.miss &lt;-<span class="st"> </span><span class="fl">0.10</span></a>
+<a class="sourceLine" id="cb21-12" data-line-number="12">X.test[<span class="kw">runif</span>(Nt<span class="op">*</span>p)<span class="op">&lt;</span>p.miss] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb21-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb21-14" data-line-number="14"><span class="co"># Prediction on test set</span></a>
+<a class="sourceLine" id="cb21-15" data-line-number="15">pr.saem &lt;-<span class="st"> </span><span class="kw">pred_saem</span>(X.test, list.saem.select<span class="op">$</span>beta, list.saem.select<span class="op">$</span>mu, list.saem.select<span class="op">$</span>sig2)</a>
+<a class="sourceLine" id="cb21-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb21-17" data-line-number="17"><span class="co"># Confusion matrix</span></a>
+<a class="sourceLine" id="cb21-18" data-line-number="18">pred.saem =<span class="st"> </span>(pr.saem<span class="op">&gt;</span><span class="fl">0.5</span>)<span class="op">*</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb21-19" data-line-number="19"><span class="kw">table</span>(y.test,pred.saem )</a></code></pre></div>
+<pre><code>##       pred.saem
+## y.test  0  1
+##      0 66  7
+##      1  8 19</code></pre>
+</div>
+<div id="reference" class="section level2">
+<h2>Reference</h2>
+<p>Stochastic approximation EM for logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), arXiv:1805.04602.</p>
 </div>
 
 

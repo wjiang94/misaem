@@ -6,6 +6,8 @@
 #' @param beta Estimated parameter of logistic regression model.
 #' @param iflog If TRUE, log_reg calculate the log-likelihood; else likelihood.
 #' @return Likelihood or log-likelihood.
+#' @examples
+#' res = log_reg(1,c(1,2,3),c(1,-1,1))
 #' @export
 log_reg <- function(y,x,beta,iflog=TRUE){
   res <- y*(x%*%beta) - log(1+exp(x%*%beta))

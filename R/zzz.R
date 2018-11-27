@@ -7,11 +7,11 @@
     packageStartupMessage(pdesc$Package,
                           " "
                           , pdesc$Version,
-                          " par
+                          " by
                           "
                           ,pdesc$Author)
-    packageStartupMessage(paste0('-> For help, type: help('
+    packageStartupMessage(paste0('-> For help, please type: vignette(\''
                                  ,pkgname,
-                                 ')'))
+                                 '\')'))
     packageStartupMessage('')
   }}

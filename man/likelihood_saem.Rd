@@ -4,7 +4,8 @@
 \alias{likelihood_saem}
 \title{likelihood_saem}
 \usage{
-likelihood_saem(beta, mu, Sigma, Y, X.obs, rindic, whichcolXmissing, mc.size)
+likelihood_saem(beta, mu, Sigma, Y, X.obs, rindic, whichcolXmissing,
+  mc.size)
 }
 \arguments{
 \item{beta}{Estimated parameter of logistic regression model.}
@@ -27,5 +28,5 @@ likelihood_saem(beta, mu, Sigma, Y, X.obs, rindic, whichcolXmissing, mc.size)
 Observed log-likelihood.
 }
 \description{
-Caculate the observed log-likelihood for logistic regression model with missing data, using Monte Carlo version of Louis formula.
+Used in main function `miss.saem`. Caculate the observed log-likelihood for logistic regression model with missing data, using Monte Carlo version of Louis formula.
 }

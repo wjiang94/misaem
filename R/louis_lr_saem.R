@@ -1,6 +1,6 @@
 #' louis_lr_saem
 #'
-#' Caculate the variance of estimated parameters for logistic regression model with missing data, using Monte Carlo version of Louis formula.
+#' Used in main function `miss.saem`. Caculate the variance of estimated parameters for logistic regression model with missing data, using Monte Carlo version of Louis formula.
 #' @param beta Estimated parameter of logistic regression model.
 #' @param mu Estimated parameter \eqn{\mu}.
 #' @param Sigma Estimated parameter \eqn{\Sigma}.
@@ -17,7 +17,6 @@
 
 louis_lr_saem = function(beta,mu,Sigma,Y,X.obs,pos_var,rindic,whichcolXmissing,mc.size){
   n=dim(X.obs)[1]
-  #p=dim(X.obs)[2]
   p = length(pos_var)
   beta = beta[c(1,pos_var+1)]
   mu = mu[pos_var]

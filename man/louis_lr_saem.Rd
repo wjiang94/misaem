@@ -30,5 +30,5 @@ louis_lr_saem(beta, mu, Sigma, Y, X.obs, pos_var, rindic, whichcolXmissing,
 Variance of estimated \eqn{\beta}.
 }
 \description{
-Caculate the variance of estimated parameters for logistic regression model with missing data, using Monte Carlo version of Louis formula.
+Used in main function `miss.saem`. Caculate the variance of estimated parameters for logistic regression model with missing data, using Monte Carlo version of Louis formula.
 }

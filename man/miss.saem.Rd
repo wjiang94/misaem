@@ -5,15 +5,15 @@
 \title{miss.saem}
 \usage{
 miss.saem(X.obs, y, pos_var = 1:ncol(X.obs), maxruns = 500,
-  tol_em = 1e-07, nmcmc = 2, tau = 1, k1 = 50, print_iter = TRUE,
-  var_cal = FALSE, ll_obs_cal = FALSE)
+  tol_em = 1e-07, nmcmc = 2, tau = 1, k1 = 50, seed = 200,
+  print_iter = TRUE, var_cal = FALSE, ll_obs_cal = FALSE)
 }
 \arguments{
 \item{X.obs}{Design matrix with missingness \eqn{N \times p}{N * p}}
 
 \item{y}{Response vector \eqn{N \times 1}{N * 1}}
 
-\item{pos_var}{Index of selected covariates. The default is pos_var = 1:p.}
+\item{pos_var}{Index of selected covariates. The default is pos_var = 1:ncol(X.obs).}
 
 \item{maxruns}{Maximum number of iterations. The default is maxruns = 500.}
 
@@ -24,6 +24,8 @@ miss.saem(X.obs, y, pos_var = 1:ncol(X.obs), maxruns = 500,
 \item{tau}{Rate \eqn{\tau}{\tau} in the step size \eqn{(k-k_{1})^{-\tau}}{(k-k1)^(-\tau)}. The default is tau = 1.}
 
 \item{k1}{Number of first iterations \eqn{k_{1}}{k1} in the step size \eqn{(k-k_{1})^{-\tau}}{(k-k1)^(-\tau)}. The default is k1=50.}
+
+\item{seed}{An integer as a seed set for the radom generator. The default value is 200.}
 
 \item{print_iter}{If TRUE, miss.saem will print the estimated parameters in each iteration of SAEM.}
 
@@ -44,11 +46,11 @@ A list with components
 \item{std_obs}{Estimated standard error for estimated parameters.}
 }
 \description{
-Main function: using algorithm SAEM to fit the logistic regression model with missing data
+This function uses algorithm SAEM to fit the logistic regression model with missing data.
 }
 \examples{
 # Generate dataset
-N <- 1000  # number of subjects
+N <- 500  # number of subjects
 p <- 5     # number of explanatory variables
 mu.star <- 1:p  #rep(0,p)  # mean of the explanatory variables
 sd <- 1:p # rep(1,p) # standard deviations
@@ -58,12 +60,12 @@ C <- matrix(c(   # correlation matrix
 0,   0,   1,   0.3, 0.6,
 0,   0,   0.3, 1,   0.7,
 0,   0,   0.6, 0.7, 1), nrow=p)
-Sigma.star <- diag(sd)\%*\%C\%*\%diag(sd) # variance-covariance matrix of the explanatory variables
-beta.star <- c(0.5, -0.3, 1, 0, -0.6) # coefficients
-beta0.star <- -0.2  # intercept
+Sigma.star <- diag(sd)\%*\%C\%*\%diag(sd) # covariance
+beta.star <- c(1, -1, 1, 0, -1) # coefficients
+beta0.star <- -0  # intercept
 beta.true = c(beta0.star,beta.star)
-X.complete <- matrix(rnorm(N*p), nrow=N)\%*\%chol(Sigma.star)
-             + matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+X.complete <- matrix(rnorm(N*p), nrow=N)\%*\%chol(Sigma.star)+
+              matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
 p1 <- 1/(1+exp(-X.complete\%*\%beta.star-beta0.star))
 y <- as.numeric(runif(N)<p1)
 
