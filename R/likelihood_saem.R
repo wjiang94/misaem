@@ -11,26 +11,42 @@
 #' @param mc.size Monte Carlo sampling size.
 #' @import mvtnorm stats MASS
 #' @return Observed log-likelihood.
+#' @examples
+#' # Generate dataset
+#' N <- 50  # number of subjects
+#' p <- 3     # number of explanatory variables
+#' mu.star <- rep(0,p)  # mean of the explanatory variables
+#' Sigma.star <- diag(rep(1,p)) # covariance
+#' beta.star <- c(1, 1,  0) # coefficients
+#' beta0.star <- 0 # intercept
+#' beta.true = c(beta0.star,beta.star)
+#' X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star) +
+#'               matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+#' p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
+#' y <- as.numeric(runif(N)<p1)
+
+#' # Generate missingness
+#' p.miss <- 0.10
+#' patterns <- runif(N*p)<p.miss #missing completely at random
+#' X.obs <- X.complete
+#' X.obs[patterns] <- NA
+#'
+#' # Observed log-likelihood
+#' ll_obs = likelihood_saem(beta.true,mu.star,Sigma.star,y,X.obs)
 #' @export
 
 
-likelihood_saem = function(beta,mu,Sigma,Y,X.obs,rindic,whichcolXmissing,mc.size){
+likelihood_saem = function(beta,mu,Sigma,Y,X.obs,rindic=as.matrix(is.na(X.obs)),whichcolXmissing=(1:ncol(rindic))[apply(rindic,2,sum)>0],mc.size=2){
   n=dim(X.obs)[1]
   p=dim(X.obs)[2]
   lh=0
-  lh1=0
-  lh2=0
   for(i in 1:n){
     y=Y[i]
     x=X.obs[i,]
-    #if(sum(rindic[i,])==0){lh=lh+log_reg(y=y,x=c(1,x),beta,iflog=FALSE)+dmvnorm(x, mean = mu, sigma = Sigma, log = FALSE)}
     if(sum(rindic[i,])==0){
       lr = log_reg(y=y,x=c(1,x),beta,iflog=TRUE)
       nm = dmvnorm(x, mean = mu, sigma = Sigma, log = TRUE)
       lh=lh+lr+nm
-      lh1=lh1+lr
-      lh2=lh2+nm
-      #if(nm <= -100){cat(sprintf('i='),i,sprintf('logLik(lr)='),lr,sprintf('logLik(nm)='),nm,'\n')}
     }
     else{
       miss_col = which(rindic[i,]==TRUE)
@@ -50,12 +66,9 @@ likelihood_saem = function(beta,mu,Sigma,Y,X.obs,rindic,whichcolXmissing,mc.size
         lh_mis1 = lh_mis1 + log_reg(y=y,x=c(1,x),beta,iflog=FALSE)
       }
       lr = log(lh_mis1/mc.size)
-      lh1 = lh1 + lr
       if(length(x2)>1){nm = dmvnorm(x2, mean = mu2, sigma = sigma22, log = TRUE)}
       if(length(x2)==1){nm = dnorm(x2, mean=mu2, sd=sqrt(sigma22), log = TRUE)}
-      lh2 = lh2 + nm
       lh = lh + lr + nm
-      #if(nm <= -100){cat(sprintf('i='),i,sprintf('logLik(lr)='),lr,sprintf('logLik(nm)='),nm,'\n')}
     }
   }
   return(ll=lh)
