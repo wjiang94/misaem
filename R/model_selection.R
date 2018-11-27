@@ -1,6 +1,6 @@
 #' model_selection
 #'
-#' Model selection for the logistic regression model with missing data
+#' Model selection for the logistic regression model with missing data.
 #' @param X.obs Design matrix with missingness \eqn{N \times p}{N * p}
 #' @param y Response vector \eqn{N \times 1}{N * 1}
 #' @param seed  An integer as a seed set for the radom generator. The default value is 200.

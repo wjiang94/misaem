@@ -21,7 +21,7 @@ A list with components
 \item{mu}{Estimated \eqn{\mu}{\mu} for the best model.}
 }
 \description{
-Model selection for the logistic regression model with missing data
+Model selection for the logistic regression model with missing data.
 }
 \examples{
 # Generate dataset

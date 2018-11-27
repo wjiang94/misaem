@@ -18,10 +18,10 @@ pred_saem(X.test, beta.saem, mu.saem, sig2.saem, seed = 200)
 \item{seed}{An integer as a seed set for the radom generator. The default value is 200.}
 }
 \value{
-\item{pr.saem}{The prediction result for logistic regression: the probability of response $y=1$.}
+\item{pr.saem}{The prediction result for logistic regression: the probability of response y=1.}
 }
 \description{
-Prediction on test with missing values for the logistic regression model
+Prediction on test with missing values for the logistic regression model.
 }
 \examples{
 # Generate dataset

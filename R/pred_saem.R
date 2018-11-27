@@ -1,13 +1,13 @@
 #' pred_saem
 #'
-#' Prediction on test with missing values for the logistic regression model
+#' Prediction on test with missing values for the logistic regression model.
 #' @param X.test Design matrix in test set.
 #' @param beta.saem Estimated \eqn{\beta}{\beta} by SAEM.
 #' @param sig2.saem Estimated \eqn{\Sigma}{\Sigma} by SAEM.
 #' @param mu.saem Estimated \eqn{\mu}{\mu} by SAEM.
 #' @param seed  An integer as a seed set for the radom generator. The default value is 200.
 #' @return
-#' \item{pr.saem}{The prediction result for logistic regression: the probability of response $y=1$.}
+#' \item{pr.saem}{The prediction result for logistic regression: the probability of response y=1.}
 #' @import mvtnorm stats
 #' @examples
 #' # Generate dataset

@@ -28,5 +28,5 @@ likelihood_saem(beta, mu, Sigma, Y, X.obs, rindic, whichcolXmissing,
 Observed log-likelihood.
 }
 \description{
-Used in main function `miss.saem`. Caculate the observed log-likelihood for logistic regression model with missing data, using Monte Carlo version of Louis formula.
+Used in main function miss.saem. Caculate the observed log-likelihood for logistic regression model with missing data, using Monte Carlo version of Louis formula.
 }
