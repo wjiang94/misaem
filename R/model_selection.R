@@ -80,6 +80,7 @@ model_selection = function(X.obs,y,seed=200){
       }
     }
   }
+  SUBSETS[p,]=rep(1,p)
   list.saem.subset=miss.saem(data.matrix(X.obs),y,1:p,maxruns=500,tol_em=1e-7,nmcmc=2,print_iter=FALSE,ll_obs_cal=TRUE)
   ll[p,1] = list.saem.subset$ll
   nb.x = p

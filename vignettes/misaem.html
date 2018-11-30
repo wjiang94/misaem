@@ -12,7 +12,7 @@
 
 <meta name="author" content="Wei Jiang" />
 
-<meta name="date" content="2018-11-27" />
+<meta name="date" content="2018-11-30" />
 
 <title>Stochastic Approximation EM for Logistic Regression with Missing Values</title>
 
@@ -278,7 +278,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Stochastic Approximation EM for Logistic Regression with Missing Values</h1>
 <h4 class="author"><em>Wei Jiang</em></h4>
-<h4 class="date"><em>2018-11-27</em></h4>
+<h4 class="date"><em>2018-11-30</em></h4>
 
 
 
@@ -326,12 +326,13 @@ and <span class="math inline">\(C\)</span> the correlation matrix <span class="m
 <a class="sourceLine" id="cb1-16" data-line-number="16">beta.true =<span class="st"> </span><span class="kw">c</span>(beta0.star,beta.star)</a>
 <a class="sourceLine" id="cb1-17" data-line-number="17"></a>
 <a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co"># Design matrix</span></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">X.complete &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(N<span class="op">*</span>p), <span class="dt">nrow=</span>N)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)<span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,N), <span class="dt">nrow=</span>N, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="co"># Reponse vector</span></a>
-<a class="sourceLine" id="cb1-22" data-line-number="22">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.complete<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))</a>
-<a class="sourceLine" id="cb1-23" data-line-number="23">y &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(N)<span class="op">&lt;</span>p1)</a></code></pre></div>
-<p>Then we randomly introduced 10% of missing values in the covariates according to the MCAR (Missing completelu at random) mechanism.</p>
+<a class="sourceLine" id="cb1-19" data-line-number="19">X.complete &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(N<span class="op">*</span>p), <span class="dt">nrow=</span>N)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)<span class="op">+</span></a>
+<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="st">              </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,N), <span class="dt">nrow=</span>N, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb1-22" data-line-number="22"><span class="co"># Reponse vector</span></a>
+<a class="sourceLine" id="cb1-23" data-line-number="23">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.complete<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))</a>
+<a class="sourceLine" id="cb1-24" data-line-number="24">y &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(N)<span class="op">&lt;</span>p1)</a></code></pre></div>
+<p>Then we randomly introduced 10% of missing values in the covariates according to the MCAR (Missing completely at random) mechanism.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># Generate missingness</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">200</span>)</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">p.miss &lt;-<span class="st"> </span><span class="fl">0.10</span></a>
@@ -461,7 +462,7 @@ and <span class="math inline">\(C\)</span> the correlation matrix <span class="m
 </div>
 <div id="model-selection-with-missing-values" class="section level2">
 <h2>Model selection with missing values</h2>
-<p>To perform model selection with missing values, we adapt criterion BIC and stepwise method. The function <code>model_selection</code> will return the index of variates included in the best model selected, and also the estimates for the best model. Pay attention that here the dimension of dataset should be less than 20 to avoid blocking your computer.</p>
+<p>To perform model selection with missing values, we adapt criterion BIC and step-wise method. The function <code>model_selection</code> will return the index of variables included in the best model selected, and also the estimates for the best model. Pay attention that here the dimension of dataset should be less than 20 to avoid blocking your computer.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># model selection for SAEM</span></a>
 <a class="sourceLine" id="cb15-2" data-line-number="2">list.saem.select =<span class="st"> </span><span class="kw">model_selection</span>(X.obs,y)</a></code></pre></div>
 <pre><code>## iteration = 10 beta = 0.03693459 0.9922979 -0.9512952 1.089339 0 -1.028696 
@@ -505,22 +506,24 @@ and <span class="math inline">\(C\)</span> the correlation matrix <span class="m
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># Generate test set with missingness</span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">200</span>)</a>
 <a class="sourceLine" id="cb21-3" data-line-number="3">Nt =<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb21-4" data-line-number="4">X.test &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(Nt<span class="op">*</span>p), <span class="dt">nrow=</span>Nt)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)<span class="op">+</span><span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,Nt), <span class="dt">nrow=</span>Nt, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb21-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co"># Real value for response of test set</span></a>
-<a class="sourceLine" id="cb21-7" data-line-number="7">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.test<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))</a>
-<a class="sourceLine" id="cb21-8" data-line-number="8">y.test &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(Nt)<span class="op">&lt;</span>p1)</a>
-<a class="sourceLine" id="cb21-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb21-10" data-line-number="10"><span class="co"># Generate missingness on test set</span></a>
-<a class="sourceLine" id="cb21-11" data-line-number="11">p.miss &lt;-<span class="st"> </span><span class="fl">0.10</span></a>
-<a class="sourceLine" id="cb21-12" data-line-number="12">X.test[<span class="kw">runif</span>(Nt<span class="op">*</span>p)<span class="op">&lt;</span>p.miss] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb21-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb21-14" data-line-number="14"><span class="co"># Prediction on test set</span></a>
-<a class="sourceLine" id="cb21-15" data-line-number="15">pr.saem &lt;-<span class="st"> </span><span class="kw">pred_saem</span>(X.test, list.saem.select<span class="op">$</span>beta, list.saem.select<span class="op">$</span>mu, list.saem.select<span class="op">$</span>sig2)</a>
-<a class="sourceLine" id="cb21-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb21-17" data-line-number="17"><span class="co"># Confusion matrix</span></a>
-<a class="sourceLine" id="cb21-18" data-line-number="18">pred.saem =<span class="st"> </span>(pr.saem<span class="op">&gt;</span><span class="fl">0.5</span>)<span class="op">*</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb21-19" data-line-number="19"><span class="kw">table</span>(y.test,pred.saem )</a></code></pre></div>
+<a class="sourceLine" id="cb21-4" data-line-number="4">X.test &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(Nt<span class="op">*</span>p), <span class="dt">nrow=</span>Nt)<span class="op">%*%</span><span class="kw">chol</span>(Sigma.star)<span class="op">+</span></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="st">          </span><span class="kw">matrix</span>(<span class="kw">rep</span>(mu.star,Nt), <span class="dt">nrow=</span>Nt, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co"># Real value for response of test set</span></a>
+<a class="sourceLine" id="cb21-8" data-line-number="8">p1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(<span class="op">-</span>X.test<span class="op">%*%</span>beta.star<span class="op">-</span>beta0.star))</a>
+<a class="sourceLine" id="cb21-9" data-line-number="9">y.test &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">runif</span>(Nt)<span class="op">&lt;</span>p1)</a>
+<a class="sourceLine" id="cb21-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb21-11" data-line-number="11"><span class="co"># Generate missingness on test set</span></a>
+<a class="sourceLine" id="cb21-12" data-line-number="12">p.miss &lt;-<span class="st"> </span><span class="fl">0.10</span></a>
+<a class="sourceLine" id="cb21-13" data-line-number="13">X.test[<span class="kw">runif</span>(Nt<span class="op">*</span>p)<span class="op">&lt;</span>p.miss] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb21-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb21-15" data-line-number="15"><span class="co"># Prediction on test set</span></a>
+<a class="sourceLine" id="cb21-16" data-line-number="16">pr.saem &lt;-<span class="st"> </span><span class="kw">pred_saem</span>(X.test, list.saem.select<span class="op">$</span>beta, </a>
+<a class="sourceLine" id="cb21-17" data-line-number="17">                     list.saem.select<span class="op">$</span>mu, list.saem.select<span class="op">$</span>sig2)</a>
+<a class="sourceLine" id="cb21-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb21-19" data-line-number="19"><span class="co"># Confusion matrix</span></a>
+<a class="sourceLine" id="cb21-20" data-line-number="20">pred.saem =<span class="st"> </span>(pr.saem<span class="op">&gt;</span><span class="fl">0.5</span>)<span class="op">*</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb21-21" data-line-number="21"><span class="kw">table</span>(y.test,pred.saem )</a></code></pre></div>
 <pre><code>##       pred.saem
 ## y.test  0  1
 ##      0 66  7
@@ -528,7 +531,7 @@ and <span class="math inline">\(C\)</span> the correlation matrix <span class="m
 </div>
 <div id="reference" class="section level2">
 <h2>Reference</h2>
-<p>Stochastic approximation EM for logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), arXiv:1805.04602.</p>
+<p>Stochastic approximation EM for logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), <a href="https://arxiv.org/abs/1805.04602">arXiv:1805.04602</a>.</p>
 </div>
 
 

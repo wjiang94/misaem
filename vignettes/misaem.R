@@ -17,7 +17,8 @@ beta0.star <- 0  # intercept
 beta.true = c(beta0.star,beta.star)
 
 # Design matrix
-X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)+ matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)+
+              matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
 
 # Reponse vector
 p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
@@ -58,7 +59,8 @@ print(list.saem.select$beta)
 # Generate test set with missingness
 set.seed(200)
 Nt = 100
-X.test <- matrix(rnorm(Nt*p), nrow=Nt)%*%chol(Sigma.star)+ matrix(rep(mu.star,Nt), nrow=Nt, byrow = TRUE)
+X.test <- matrix(rnorm(Nt*p), nrow=Nt)%*%chol(Sigma.star)+
+          matrix(rep(mu.star,Nt), nrow=Nt, byrow = TRUE)
 
 # Real value for response of test set
 p1 <- 1/(1+exp(-X.test%*%beta.star-beta0.star))
@@ -69,7 +71,8 @@ p.miss <- 0.10
 X.test[runif(Nt*p)<p.miss] <- NA
 
 # Prediction on test set
-pr.saem <- pred_saem(X.test, list.saem.select$beta, list.saem.select$mu, list.saem.select$sig2)
+pr.saem <- pred_saem(X.test, list.saem.select$beta, 
+                     list.saem.select$mu, list.saem.select$sig2)
 
 # Confusion matrix
 pred.saem = (pr.saem>0.5)*1

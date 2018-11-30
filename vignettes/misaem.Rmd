@@ -59,14 +59,15 @@ beta0.star <- 0  # intercept
 beta.true = c(beta0.star,beta.star)
 
 # Design matrix
-X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)+ matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)+
+              matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
 
 # Reponse vector
 p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
 y <- as.numeric(runif(N)<p1)
 ```
 
-Then we randomly introduced 10\% of missing values in the covariates according to the MCAR (Missing completelu at random) mechanism.
+Then we randomly introduced 10\% of missing values in the covariates according to the MCAR (Missing completely at random) mechanism.
 ```{r}
 # Generate missingness
 set.seed(200)
@@ -102,7 +103,7 @@ print(list.saem$var_obs)
 ```
 
 ## Model selection with missing values
-To perform model selection with missing values, we adapt criterion BIC and stepwise method. The function `model_selection` will return the index of variates included in the best model selected, and also the estimates for the best model. Pay attention that here the dimension of dataset should be less than 20 to avoid blocking your computer.
+To perform model selection with missing values, we adapt criterion BIC and step-wise method. The function `model_selection` will return the index of variables included in the best model selected, and also the estimates for the best model. Pay attention that here the dimension of dataset should be less than 20 to avoid blocking your computer.
 
 ```{r}
 # model selection for SAEM
@@ -117,7 +118,8 @@ In order to evaluate the prediction performance, we generate a test set of size 
 # Generate test set with missingness
 set.seed(200)
 Nt = 100
-X.test <- matrix(rnorm(Nt*p), nrow=Nt)%*%chol(Sigma.star)+ matrix(rep(mu.star,Nt), nrow=Nt, byrow = TRUE)
+X.test <- matrix(rnorm(Nt*p), nrow=Nt)%*%chol(Sigma.star)+
+          matrix(rep(mu.star,Nt), nrow=Nt, byrow = TRUE)
 
 # Real value for response of test set
 p1 <- 1/(1+exp(-X.test%*%beta.star-beta0.star))
@@ -128,7 +130,8 @@ p.miss <- 0.10
 X.test[runif(Nt*p)<p.miss] <- NA
 
 # Prediction on test set
-pr.saem <- pred_saem(X.test, list.saem.select$beta, list.saem.select$mu, list.saem.select$sig2)
+pr.saem <- pred_saem(X.test, list.saem.select$beta, 
+                     list.saem.select$mu, list.saem.select$sig2)
 
 # Confusion matrix
 pred.saem = (pr.saem>0.5)*1
@@ -136,4 +139,4 @@ table(y.test,pred.saem )
 ```
  
 ## Reference 
-Stochastic approximation EM for logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), arXiv:1805.04602.
+Stochastic approximation EM for logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), [arXiv:1805.04602](https://arxiv.org/abs/1805.04602).
