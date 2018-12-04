@@ -8,8 +8,7 @@ Depends: R (>= 3.4.0)
 Encoding: UTF-8
 License: GPL-3
 URL: https://github.com/wjiang94/misaem.git
-Imports: magrittr,
-    mvtnorm,
+Imports: mvtnorm,
     stats,
     MASS
 Suggests: knitr,
