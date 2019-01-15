@@ -1,7 +1,7 @@
 Package: misaem
-Title: Stochastic Approximation EM for Logistic Regression with Missing Values
+Title: Logistic Regression with Missing Covariates
 Version: 0.9.1
-Date: 2018-11-26
+Date: 2019-01-15
 Authors@R: person("Wei", "Jiang", email = "wei.jiang@polytechnique.edu", role = c("aut", "cre"))
 Description: Estimate parameters of logistic regression with missing data and perform model selection, using algorithm Stochastic Approximation EM.
 Depends: R (>= 3.4.0)

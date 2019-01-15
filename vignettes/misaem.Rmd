@@ -1,5 +1,5 @@
 ---
-title: "Stochastic Approximation EM for Logistic Regression with Missing Values"
+title: "Logistic Regression with Missing Covariates"
 author: "Wei Jiang"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -139,4 +139,6 @@ table(y.test,pred.saem )
 ```
  
 ## Reference 
-Stochastic approximation EM for logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), [arXiv:1805.04602](https://arxiv.org/abs/1805.04602).
+Logistic Regression with Missing Covariates
+-- Parameter Estimation, Model Selection
+and Prediction (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), [arXiv:1805.04602](https://arxiv.org/abs/1805.04602).

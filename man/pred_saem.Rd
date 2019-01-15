@@ -4,7 +4,8 @@
 \alias{pred_saem}
 \title{pred_saem}
 \usage{
-pred_saem(X.test, beta.saem, mu.saem, sig2.saem, seed = 200)
+pred_saem(X.test, beta.saem, mu.saem, sig2.saem, seed = 200,
+  method = "map")
 }
 \arguments{
 \item{X.test}{Design matrix in test set.}
@@ -16,6 +17,8 @@ pred_saem(X.test, beta.saem, mu.saem, sig2.saem, seed = 200)
 \item{sig2.saem}{Estimated \eqn{\Sigma}{\Sigma} by SAEM.}
 
 \item{seed}{An integer as a seed set for the radom generator. The default value is 200.}
+
+\item{method}{The name of method to deal with missing values in test set. It can be 'map'(maximum a posteriori) or 'impute' (imputation by conditional expectation). Default is 'map'.}
 }
 \value{
 \item{pr.saem}{The prediction result for logistic regression: the probability of response y=1.}

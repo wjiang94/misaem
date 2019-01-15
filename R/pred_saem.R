@@ -6,9 +6,10 @@
 #' @param sig2.saem Estimated \eqn{\Sigma}{\Sigma} by SAEM.
 #' @param mu.saem Estimated \eqn{\mu}{\mu} by SAEM.
 #' @param seed  An integer as a seed set for the radom generator. The default value is 200.
+#' @param method The name of method to deal with missing values in test set. It can be 'map'(maximum a posteriori) or 'impute' (imputation by conditional expectation). Default is 'map'.
 #' @return
 #' \item{pr.saem}{The prediction result for logistic regression: the probability of response y=1.}
-#' @import mvtnorm stats
+#' @import mvtnorm stats MASS
 #' @examples
 #' # Generate dataset
 #' N <- 100  # number of subjects
@@ -46,7 +47,7 @@
 #' @export
 
 
-pred_saem = function(X.test,beta.saem,mu.saem,sig2.saem,seed=200){
+pred_saem = function(X.test,beta.saem,mu.saem,sig2.saem,seed=200,method='map'){
 
   #judge
   if (class(X.test) == "data.frame") {
@@ -55,24 +56,67 @@ pred_saem = function(X.test,beta.saem,mu.saem,sig2.saem,seed=200){
   if (sum(sapply(X.test, is.numeric)) < ncol(X.test)) {
     stop("Error: the variables should be numeric.")
   }
-
+  if (method == "MAP" | method == "Map") {
+    method <- "map"
+  }
+  if (method == "Impute" | method == "IMPUTE") {
+    method <- "impute"
+  }
   set.seed(seed)
   rindic = as.matrix(is.na(X.test))
-  for(i in 1:dim(X.test)[1]){
-    if(sum(rindic[i,])!=0){
-      miss_col = which(rindic[i,]==TRUE)
-      x2 = X.test[i,-miss_col]
-      mu1 = mu.saem[miss_col]
-      mu2 = mu.saem[-miss_col]
-      sigma11 = sig2.saem[miss_col,miss_col]
-      sigma12 = sig2.saem[miss_col,-miss_col]
-      sigma22 = sig2.saem[-miss_col,-miss_col]
-      sigma21 = sig2.saem[-miss_col,miss_col]
-      mu_cond = mu1+sigma12 %*% solve(sigma22) %*% (x2-mu2)
-      X.test[i,miss_col] =mu_cond
+
+  if(method=='impute'){
+    for(i in 1:dim(X.test)[1]){
+      if(sum(rindic[i,])!=0){
+        miss_col = which(rindic[i,]==TRUE)
+        x2 = X.test[i,-miss_col]
+        mu1 = mu.saem[miss_col]
+        mu2 = mu.saem[-miss_col]
+        sigma11 = sig2.saem[miss_col,miss_col]
+        sigma12 = sig2.saem[miss_col,-miss_col]
+        sigma22 = sig2.saem[-miss_col,-miss_col]
+        sigma21 = sig2.saem[-miss_col,miss_col]
+        mu_cond = mu1+sigma12 %*% solve(sigma22) %*% (x2-mu2)
+        X.test[i,miss_col] =mu_cond
+      }
     }
+    tmp <- as.matrix(cbind.data.frame(rep(1,dim(X.test)[1]),X.test)) %*% as.matrix(beta.saem)
+    pr.saem <- 1/(1+(1/exp(tmp)))
+  }else if(method=='map'){
+    pr2 =rep(0,dim(X.test)[1])
+    mc.size = 100
+    X.test = data.matrix(X.test)
+    for(i in 1:dim(X.test)[1]){
+      x=X.test[i,]
+      if(sum(rindic[i,])==0){
+        pr2[i]=log_reg(y=1,x=c(1,x),beta.saem,iflog=FALSE)
+      }
+      else{
+        miss_col = which(rindic[i,]==TRUE)
+        x2 = X.test[i,-miss_col]
+        mu1 = mu.saem[miss_col]
+        mu2 = mu.saem[-miss_col]
+        sigma11 = sig2.saem[miss_col,miss_col]
+        sigma12 = sig2.saem[miss_col,-miss_col]
+        sigma22 = sig2.saem[-miss_col,-miss_col]
+        sigma21 = sig2.saem[-miss_col,miss_col]
+        mu_cond = mu1+sigma12 %*% solve(sigma22)%*%(x2-mu2)
+        sigma_cond = sigma11 - sigma12 %*% solve(sigma22) %*% sigma21
+        x1_all=mvrnorm(n = mc.size, mu_cond, sigma_cond, tol = 1e-6, empirical = FALSE, EISPACK = FALSE)
+        p1=0
+        for(j in 1:mc.size){
+          x[miss_col] =x1= x1_all[j,]
+          p1 = p1 + log_reg(y=1,x=c(1,x),beta.saem,iflog=FALSE)
+        }
+        pr2[i] =p1/mc.size
+      }
+    }
+    pr.saem = as.matrix(pr2)
+  } else {
+    stop("Error: There is no such method. Method should be 'map' or 'impute'. ")
   }
-  tmp <- as.matrix(cbind.data.frame(rep(1,dim(X.test)[1]),X.test)) %*% as.matrix(beta.saem)
-  pr.saem <- 1/(1+(1/exp(tmp)))
   return(pr.saem)
 }
+
+
+

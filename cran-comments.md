@@ -1,4 +1,4 @@
-# misaem 0.9.0
+# misaem 0.9.1
 
 ## Test environments
 
@@ -18,7 +18,8 @@ R CMD check succeeded
 
 
 #### win-builder
-Installation time in seconds: 4
-Check time in seconds: 304
-Status: 1 NOTE
-R Under development (unstable) (2018-11-26 r75682)
+Installation time in seconds: 6
+Check time in seconds: 372
+Status: OK
+R Under development (unstable) (2019-01-09 r75961)
+ 
