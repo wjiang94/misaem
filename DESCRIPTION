@@ -1,18 +1,22 @@
 Package: misaem
-Title: Logistic Regression with Missing Covariates
-Version: 0.9.1
-Date: 2019-01-15
-Authors@R: person("Wei", "Jiang", email = "wei.jiang@polytechnique.edu", role = c("aut", "cre"))
-Description: Estimate parameters of logistic regression with missing data and perform model selection, using algorithm Stochastic Approximation EM.
+Title: Linear Regression and Logistic Regression with Missing Covariates
+Version: 1.0.0
+Date: 2020-07-04
+Authors@R: c( person("Wei", "Jiang", email = "wei.jiang@polytechnique.edu", role = c("aut", "cre")),
+              person("Pavlo","Mozharovskyi", role = "ctb", email = "pavlo.mozharovskyi@telecom-paristech.fr"))
+Description: Estimate parameters of linear regression and logistic regression with missing covariates with missing data, perform model selection and prediction, using EM-type algorithms.
 Depends: R (>= 3.4.0)
 Encoding: UTF-8
 License: GPL-3
 URL: https://github.com/wjiang94/misaem.git
 Imports: mvtnorm,
     stats,
-    MASS
+    MASS,
+    mice,
+    norm,
+    methods
 Suggests: knitr,
     rmarkdown
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 7.1.1

@@ -1,13 +1,12 @@
-# misaem
+# misaem package
 
 ### Introduction
 
-`misaem` is an implementation of methodology which performs statistical inference for logistic regression model with missing data. This method is based on likelihood, including:
+`misaem` is a package to perform linear regression and logistic regression with missing data, under MCAR (Missing completely at random) and MAR (Missing at random) mechanisms. The covariates are assumed to be continuous variables. The methodology implemented is based on maximization of the observed likelihood using EM-types of algorithms. The package includes:
 
-1. Estimate the parameters of logistic regression by a stochastic approximation version of EM algorithm;
-2. Estimation of parameters' variance based one Louis formula;
-3. Model selection procedure based on BIC;
-4. Prediction on a test set which may contain missing values.
+1. Parameters estimation.
+2. Estimation of standard deviation for estimated parameters.
+3. Model selection procedure based on BIC. 
 
 ### Installation of package 
 Now you can install the package **misaem** from CRAN. 
@@ -15,11 +14,10 @@ Now you can install the package **misaem** from CRAN.
 install.packages("misaem")
  ```
 ### Using the misaem package
-Basicly,
+Basically,
 
-1. `miss.saem` contains the procedure of estimation for parameters, as well as their variance, and observed likelihood.
-2. `model_selection` aims at selecting a best model according to BIC.
-3. `pred_saem` performs prediction on a test set which may contain missing values.
+1. `miss.glm` is the main function performing logistic regression with missing values.
+2. `miss.lm` is the main function performing linear regression with missing values.
 
 For more details, You can find the vignette, which illustrate the basic and further usage of misaem package:
 ```{r}
@@ -27,7 +25,7 @@ library(misaem)
 vignette('misaem')
  ```
 
-### Reference
-Stochastic Approximation EM for Logistic regression with missing values (2018, Jiang W., Josse J., Lavielle M., Traumabase group)" [arxiv link](https://arxiv.org/abs/1805.04602).
-
-
+## Reference 
+Logistic Regression with Missing Covariates
+-- Parameter Estimation, Model Selection
+and Prediction (2020, Jiang W., Josse J., Lavielle M., TraumaBase Group), [Computational Statistics & Data Analysis](https://doi.org/10.1016/j.csda.2019.106907).

@@ -1,5 +1,5 @@
 ---
-title: "Logistic Regression with Missing Covariates"
+title: "Linear regression and logistic regression with missing covariates"
 author: "Wei Jiang"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -8,18 +8,146 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 ## Introduction of misaem
 
-misaem is a package to apply statistical inference for logistic regression model with missing data. This methodology is based on likelihood, including:
+`misaem` is a package to perform linear regression and logistic regression with missing data, under MCAR (Missing completely at random) and MAR (Missing at random) mechanisms. The covariates are assumed to be continuous variables. The methodology implemented is based on maximization of the observed likelihood using EM-types of algorithms. The package includes:
 
-1. A stochastic approximation version of EM algorithm based on Metropolis-Hasting sampling, to estimate the parameters of logistic regression;
-2. Estimation of parameters' variance based one Louis formula;
+1. Parameters estimation:
+* for linear regression, we consider a joint Gaussian distribution for covariates and response, then the `norm` package allows to estimate the mean vector and a variance covariance matrix with the EM algorithm and SWEEP operator. Finally we have reshaped them to obtain the regression coefficient.
+* for logistic regression, with a stochastic approximation version of EM algorithm (SAEM) based on Metropolis-Hasting sampling.
+2. Estimation of standard deviation for estimated parameters:
+* for linear regression, use the property that the Gram matrix of random variables (estimates of regression coefficients) approximates their covariance matrix;
+* for logistic regression, with Louis formula.
 3. Model selection procedure based on BIC. 
+```{r}
+library(misaem)
+```
 
 
-## Synthetic dataset
+## Linear regression
+### Synthetic dataset
+Let's generate a synthetic example of classical linear regression. We first generate a design matrix of size $n = 50$ times $p = 2$ by drawing each observation from a multivariate normal distribution $\mathcal{N}(\mu, \Sigma)$. We consider as the true values for the parameters:
+\begin{equation*}
+\begin{split}
+\mu &= (1, 1),\\
+\Sigma & = \begin{bmatrix}
+1 & 1\\
+1 & 4\\
+\end{bmatrix}
+\end{split}
+\end{equation*}
+Then, we generate the response according to the linear regression model with coefficient $\beta = (2, 3, -1)$ and variance of noise vector $\sigma^2 = 0.25$.
+```{r}
+set.seed(1)
+n <- 50 # number of rows
+p <- 2 # number of explanatory variables
 
-We first generate a design matrix of size $N=500$ times $p=5$ by drawing each observation from a multivariate normal distribution $\mathcal{N}(\mu, \Sigma)$. Then, we generate the response according to the logistic regression model.
+# Generate complete design matrix
+library(MASS)
+mu.X <- c(1, 1) 
+Sigma.X <- matrix(c(1, 1, 1, 4), nrow = 2)
+X.complete <- mvrnorm(n, mu.X, Sigma.X)
+
+# Generate response
+b <- c(2, 3, -1) # regression coefficient
+sigma.eps <- 0.25 # noise variance
+y <- cbind(rep(1, n), X.complete) %*% b + rnorm(n, 0, sigma.eps)
+```
+Then we randomly introduced 15\% of missing values in the covariates according to the MCAR (Missing completely at random) mechanism. To do so, we use the function `ampute` from the R package `mice`. For more details about how to generate missing values of different mechanisms, see the resource website of missing values [Rmisstastic](https://rmisstastic.netlify.app/).
+```{r}
+library(mice)
+# Add missing values
+yX.miss <- ampute(data.frame(y, X.complete), 0.15, patterns = matrix(
+  c(0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0), 
+  ncol = 3, byrow = TRUE), freq = c(1, 1, 1, 2, 2, 2) / 9, 
+  mech = "MCAR", bycases = FALSE)
+y.obs <- yX.miss$amp[, 1]              # responses
+X.obs <- as.matrix(yX.miss$amp[, 2:3]) # covariates with NAs
+```
+Have a look at our synthetic dataset:
+```{r}
+head(X.obs)
+```
+Check the percentage of missing values:
+```{r}
+sum(is.na(X.obs))/(n*p) 
+```
+
+### Estimation for linear regression with missing values
+The main function in our package to fit linear regression with missingness is `miss.lm` function. The function `miss.lm` mimics the structure of widely used function `lm` for the case without missing values. It takes an object of class `formula` (a symbolic description of the model to be fitted) and the data frame as the input. Here we apply this function with its default options.
+
+```{r}
+# Estimate regression using EM with NA 
+df.obs = data.frame(y, X.obs)
+miss.list = miss.lm(y~., data = df.obs)
+```
+Then it returns an object of self-defined class `miss.lm`, which consists of the estimation of parameters, their standard error and observed log-likelihood. We can print or summarize the obtained results as follows:
+```{r}
+print(miss.list)
+print(summary(miss.list)) 
+summary(miss.list)$coef 
+```
+Self-defined parameters can be also taken such as the maximum number of iterations (`maxruns`), the convergence tolerance (`tol_em`) and the logical indicating if the iterations should be reported (`print_iter`). 
+```{r}
+# Estimate regression using self-defined parameters
+miss.list2 = miss.lm(y~., data = df.obs, print_iter = FALSE, maxruns = 500, tol_em = 1e-4)
+print(miss.list2)
+```
+
+### Model selection
+The function `miss.lm.model.select` adapts a BIC criterion and step-wise method to return the best model selected. We add a null variable with missing values to check if the function can distinguish it from the true variables.
+```{r}
+# Add null variable with NA
+X.null <- mvrnorm(n, 1, 1)
+patterns <- runif(n)<0.15 # missing completely at random
+X.null[patterns] <- NA
+X.obs.null <- cbind.data.frame(X.obs, X.null)
+
+# Without model selection
+df.obs.null = data.frame(y, X.obs.null)
+miss.list.null = miss.lm(y~., data = df.obs.null)
+print(miss.list.null)
+
+# Model selection
+miss.model = miss.lm.model.select(y, X.obs.null)
+print(miss.model)
+```
+
+### Prediction on test set
+In order to evaluate the prediction performance, we generate a test set of size $nt = 20$ times $p = 2$ following the same distribution as the previous design matrix, and we add or not 15\% of missing values.
+```{r}
+# Prediction
+# Generate dataset
+set.seed(200)
+nt <- 20  # number of new observations
+Xt <- mvrnorm(nt, mu.X, Sigma.X)
+
+# Add missing values
+Xt.miss <- ampute(data.frame(Xt), 0.15, patterns = matrix(
+  c(0, 1, 1, 0), 
+  ncol = 2, byrow = TRUE), freq = c(1, 1) /2, 
+  mech = "MCAR", bycases = FALSE)
+Xt.obs <- as.matrix(Xt.miss$amp) # covariates with NAs
+```
+
+The prediction can be performed for a complete test set:
+```{r}
+#train with NA + test no NA
+miss.comptest.pred = predict(miss.list2, data.frame(Xt), seed = 100)
+print(miss.comptest.pred)
+```
+
+And we can also apply the function when both train set and test set have missing values:
+```{r}
+#both train & test with NA
+miss.pred = predict(miss.list2, data.frame(Xt.obs), seed = 100)
+print(miss.pred)
+```
+
+## Logistic regression
+### Synthetic dataset
+We first generate a design matrix of size $n=500$ times $p=5$ by drawing each observation from a multivariate normal distribution $\mathcal{N}(\mu, \Sigma)$. Then, we generate the response according to the logistic regression model.
 
 We consider as the true values for the parameters
 \begin{equation*}
@@ -43,7 +171,7 @@ $$C = \begin{bmatrix}
 ```{r}
 # Generate dataset
 set.seed(200)
-N <- 500  # number of subjects
+n <- 500  # number of subjects
 p <- 5     # number of explanatory variables
 mu.star <- 1:p  #rep(0,p)  # mean of the explanatory variables
 sd <- 1:p # rep(1,p) # standard deviations
@@ -54,17 +182,17 @@ C <- matrix(c(   # correlation matrix
 0,   0,   0.3, 1,   0.7,
 0,   0,   0.6, 0.7, 1), nrow=p)
 Sigma.star <- diag(sd)%*%C%*%diag(sd) # covariance matrix
-beta.star <- c(1, -1, 1, 0, -1) # coefficients
+beta.star <- c(1, -1, 1, 1, -1) # coefficients
 beta0.star <- 0  # intercept
 beta.true = c(beta0.star,beta.star)
 
 # Design matrix
-X.complete <- matrix(rnorm(N*p), nrow=N)%*%chol(Sigma.star)+
-              matrix(rep(mu.star,N), nrow=N, byrow = TRUE)
+X.complete <- matrix(rnorm(n*p), nrow=n)%*%chol(Sigma.star)+
+              matrix(rep(mu.star,n), nrow=n, byrow = TRUE)
 
 # Reponse vector
 p1 <- 1/(1+exp(-X.complete%*%beta.star-beta0.star))
-y <- as.numeric(runif(N)<p1)
+y <- as.numeric(runif(n)<p1)
 ```
 
 Then we randomly introduced 10\% of missing values in the covariates according to the MCAR (Missing completely at random) mechanism.
@@ -72,7 +200,7 @@ Then we randomly introduced 10\% of missing values in the covariates according t
 # Generate missingness
 set.seed(200)
 p.miss <- 0.10
-patterns <- runif(N*p)<p.miss # missing completely at random
+patterns <- runif(n*p)<p.miss # missing completely at random
 X.obs <- X.complete
 X.obs[patterns] <- NA
 ```
@@ -82,56 +210,59 @@ Have a look at our synthetic dataset:
 head(X.obs)
 ```
 
-## Main usage: Estimation for logistic regression with missingness
-
-The main function in our package is `miss.saem` function, which returns the estimation of parameters for logistic regression with missingness. Here we apply this function with its default options.
+### Estimation for logistic regression with missingness
+The main function for fitting logistic regression with missing covariates in our package is `miss.glm` function, which mimics the structure of widely used function `glm`. Note that we don't need to specify the binomial family in the input of `miss.glm` function. Here we apply this function with its default options, and then we can print or summarize the obtained results as follows:
 ```{r}
-#Charge library
-library(misaem)
+df.obs = data.frame(y, X.obs)
 
-# SAEM
-list.saem = miss.saem(X.obs,y)
-print(list.saem$beta)
+#logistic regression with NA 
+miss.list = miss.glm(y~., data = df.obs, seed = 100)
+print(miss.list)
+print(summary(miss.list)) 
+summary(miss.list)$coef 
 ```
 
-And if you need to obtain the variance of estimation:
-```{r}
-# SAEM with variance estimation
-list.saem = miss.saem(X.obs,y,var_cal = TRUE)
-print(list.saem$beta)
-print(list.saem$var_obs)
-```
-
-## Model selection with missing values
-To perform model selection with missing values, we adapt criterion BIC and step-wise method. The function `model_selection` will return the index of variables included in the best model selected, and also the estimates for the best model. Pay attention that here the dimension of dataset should be less than 20 to avoid blocking your computer.
+### Model selection 
+To perform model selection with missing values, we adapt criterion BIC and step-wise method. The function `miss.glm.model.select` outputs the best model selected. With the current implementation, when $p$ is greater than 20, it may encounter computational difficulties for the BIC based model selection. In the following simulation, we add a null variable with missing values to check if the function can distinguish it from the true variables.
 
 ```{r}
+# Add null variable with NA
+X.null <- mvrnorm(n, 1, 1)
+patterns <- runif(n)<0.10 # missing completely at random
+X.null[patterns] <- NA
+X.obs.null <- cbind.data.frame(X.obs, X.null)
+
+# Without model selection
+df.obs.null = data.frame(y, X.obs.null)
+miss.list.null = miss.glm(y~., data = df.obs.null)
+print(miss.list.null)
+
 # model selection for SAEM
-list.saem.select = model_selection(X.obs,y)
-print(list.saem.select$subset_choose)
-print(list.saem.select$beta)
+miss.model = miss.glm.model.select(y, X.obs.null)
+print(miss.model)
 ```
 
-## Prediction on test set
-In order to evaluate the prediction performance, we generate a test set of size $Nt=100$ times $p=5$ follow the same distribution as previous design matrix, and also with 10\% of missing values. Given the real value of response according to the logistic regression model, we can evaluate the prediction results by a confusion matrix.
+
+
+### Prediction on test set
+In order to evaluate the prediction performance, we generate a test set of size $nt = 100$ times $p = 5$ following the same distribution as the design matrix, and without and with 10\% of missing values. We  evaluate the prediction quality with a confusion matrix.
 ```{r}
 # Generate test set with missingness
 set.seed(200)
-Nt = 100
-X.test <- matrix(rnorm(Nt*p), nrow=Nt)%*%chol(Sigma.star)+
-          matrix(rep(mu.star,Nt), nrow=Nt, byrow = TRUE)
+nt = 100
+X.test <- matrix(rnorm(nt*p), nrow=nt)%*%chol(Sigma.star)+
+          matrix(rep(mu.star,nt), nrow = nt, byrow = TRUE)
 
-# Real value for response of test set
+# Generate the test set
 p1 <- 1/(1+exp(-X.test%*%beta.star-beta0.star))
-y.test <- as.numeric(runif(Nt)<p1)
+y.test <- as.numeric(runif(nt)<p1)
 
 # Generate missingness on test set
 p.miss <- 0.10
-X.test[runif(Nt*p)<p.miss] <- NA
+X.test[runif(nt*p)<p.miss] <- NA
 
 # Prediction on test set
-pr.saem <- pred_saem(X.test, list.saem.select$beta, 
-                     list.saem.select$mu, list.saem.select$sig2)
+pr.saem <- predict(miss.list, data.frame(X.test))
 
 # Confusion matrix
 pred.saem = (pr.saem>0.5)*1
@@ -141,4 +272,4 @@ table(y.test,pred.saem )
 ## Reference 
 Logistic Regression with Missing Covariates
 -- Parameter Estimation, Model Selection
-and Prediction (2018, Jiang W., Josse J., Lavielle M., Traumabase Group), [arXiv:1805.04602](https://arxiv.org/abs/1805.04602).
+and Prediction (2020, Jiang W., Josse J., Lavielle M., TraumaBase Group), [Computational Statistics \& Data Analysis](https://doi.org/10.1016/j.csda.2019.106907).

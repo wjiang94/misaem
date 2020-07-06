@@ -1,0 +1,20 @@
+citHeader("To cite misaem in publications use:")
+
+citEntry(entry = "Article",
+  title        = "Logistic regression with missing covariates—Parameter estimation, model selection and prediction within a joint-modeling framework",
+  author       =  personList(person("Wei", "Jiang"),
+                   as.person("Julie Josse"),
+                   as.person("Marc Lavielle"),
+                   as.person("TraumaBase Group")),
+  journal      = "Computational Statistics & Data Analysis",
+  year         = "2020",
+  volume       = "145",
+  pages        = "106907",
+  publisher    = "Elsevier",
+  url          = "https://doi.org/10.1016/j.csda.2019.106907",
+
+  textVersion  =
+  paste("Wei Jiang, Julie Josse, Marc Lavielle, TraumaBase Group (2020).",
+        "Logistic regression with missing covariates—Parameter estimation, model selection and prediction within a joint-modeling framework.",
+        "Computational Statistics & Data Analysis, 145, 106907.",
+        "URL https://doi.org/10.1016/j.csda.2019.106907."))
